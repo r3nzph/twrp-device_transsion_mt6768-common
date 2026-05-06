@@ -1,40 +1,26 @@
-# Dynamic partitions (read-only)
-system      /system      ext4    ro,barrier=1,discard   wait,logical,first_stage_mount
-system_ext  /system_ext  ext4    ro,barrier=1,discard   wait,logical,first_stage_mount
-vendor      /vendor      ext4    ro,barrier=1,discard   wait,logical,first_stage_mount
-product     /product     ext4    ro,barrier=1,discard   wait,logical,first_stage_mount
+# Dynamic partitions (read-only, A/B safe)
+system      /system      ext4    ro,barrier=1    wait,logical,first_stage_mount,slotselect
+system_ext  /system_ext  ext4    ro,barrier=1    wait,logical,first_stage_mount,slotselect
+vendor      /vendor      ext4    ro,barrier=1    wait,logical,first_stage_mount,slotselect
+product     /product     ext4    ro,barrier=1    wait,logical,first_stage_mount,slotselect
 
-# Metadata (required for Android 12/13)
-#/dev/block/by-name/md_udc is correct on your device
-/dev/block/by-name/md_udc   /metadata   ext4    noatime,nosuid,nodev,discard   wait,check,formattable
+# Metadata (required for Android 12/13 FBE)
+# Verify md_udc is correct symlink to metadata
+/dev/block/by-name/md_udc   /metadata   ext4    noatime,nosuid,nodev    wait,check,formattable
 
-# DATA (NO ENCRYPTION FLAGS – important)
-# Use ext4 first for stability in recovery
-/dev/block/by-name/userdata   /data   ext4    noatime,nosuid,nodev,discard   wait,check,formattable
+# Data (NO encryption flags — non-decrypting setup)
+# Using ext4 for recovery stability
+/dev/block/by-name/userdata   /data   ext4    noatime,nosuid,nodev    wait,check,formattable,quota
 
-# Optional mounts (useful but safe)
-#/persist
-/dev/block/by-name/persist   /mnt/vendor/persist   ext4   noatime,nosuid,nodev   wait,check,formattable
+# Vendor-related persistent partitions (MTK specific)
+/dev/block/by-name/persist    /mnt/vendor/persist    ext4    noatime,nosuid,nodev    wait,check,formattable
+/dev/block/by-name/nvdata     /mnt/vendor/nvdata     ext4    noatime,nosuid,nodev    wait,check,formattable
+/dev/block/by-name/nvcfg      /mnt/vendor/nvcfg      ext4    noatime,nosuid,nodev    wait,check,formattable
+/dev/block/by-name/protect1   /mnt/vendor/protect_f  ext4    noatime,nosuid,nodev    wait,check,formattable
+/dev/block/by-name/protect2   /mnt/vendor/protect_s  ext4    noatime,nosuid,nodev    wait,check,formattable
 
-#/nvdata
-/dev/block/by-name/nvdata    /mnt/vendor/nvdata    ext4   noatime,nosuid,nodev   wait,check,formattable
-
-#/nvcfg
-/dev/block/by-name/nvcfg     /mnt/vendor/nvcfg     ext4   noatime,nosuid,nodev   wait,check,formattable
-
-#/protect partitions
-/dev/block/by-name/protect1  /mnt/vendor/protect_f ext4   noatime,nosuid,nodev   wait,check,formattable
-/dev/block/by-name/protect2  /mnt/vendor/protect_s ext4   noatime,nosuid,nodev   wait,check,formattable
-
-# Boot related (no need to modify)
-#/boot
-/dev/block/by-name/boot      /boot      emmc   defaults   defaults
-
-#/vendor_boot
-/dev/block/by-name/vendor_boot   /vendor_boot   emmc   defaults   defaults
-
-#/dtbo
-/dev/block/by-name/dtbo      /dtbo      emmc   defaults   defaults
-
-#/vbmeta
-/dev/block/by-name/vbmeta    /vbmeta    emmc   defaults   defaults
+# Boot-related partitions (for flashing)
+/dev/block/by-name/boot          /boot          emmc    defaults    defaults
+/dev/block/by-name/vendor_boot   /vendor_boot   emmc    defaults    defaults
+/dev/block/by-name/dtbo          /dtbo          emmc    defaults    defaults
+/dev/block/by-name/vbmeta        /vbmeta        emmc    defaults    defaults
