@@ -198,7 +198,7 @@ TW_HAS_MTP := true
 
 # Storage
 RECOVERY_SDCARD_ON_DATA := true
-TW_USB_STORAGE := true
+# TW_USB_STORAGE := true
 
 # Props
 TARGET_SYSTEM_PROP := $(DEVICE_PATH)/system.prop
