@@ -1,5 +1,8 @@
 import /init.recovery.trustonic.rc
 
+on boot
+    write /sys/class/usb_role/mt_usb-role-switch/role device
+
 on init
     export LD_LIBRARY_PATH /system/lib64:/vendor/lib64:/vendor/lib64/hw:/system/lib64/hw
 
@@ -12,8 +15,10 @@ on fs
     
     install_keyring
 
-    write /sys/class/power_supply/usb/otg_switch 1
-    write /sys/class/oplus_chg/usb/otg_switch 1
+on init
+    wait /sys/class/usb_role/mt_usb-role-switch/role
+    write /sys/class/usb_role/mt_usb-role-switch/role host
+
 
 on post-fs
     # Support A/B feature for EMMC and UFS boot region
