@@ -1,4 +1,4 @@
-### OFRP device tree for tecno spark 20 (KJ5)
+### TWRP device tree for tecno spark 20 (KJ5)
 
 =========================================
 
@@ -27,7 +27,7 @@ Works:
 - [ ] Decryption
 - [X] Display
 - [X] Flashing
-- [X] MTP
+- [ ] MTP
 - [X] Sideload
 - [X] USB OTG
 - [ ] Vibrator
