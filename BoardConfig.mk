@@ -206,5 +206,11 @@ TARGET_SYSTEM_PROP := $(DEVICE_PATH)/system.prop
 # Temp
 TW_CUSTOM_CPU_TEMP_PATH := sys/devices/virtual/thermal/thermal_zone4/temp
 
+# StatusBar
+TW_STATUS_ICONS_ALIGN := center
+TW_CUSTOM_CPU_POS := "300"
+TW_CUSTOM_CLOCK_POS := "70"
+TW_CUSTOM_BATTERY_POS := "790
+
 # Device 
 TW_DEVICE_VERSION := SPARK 20 by r3nzph
