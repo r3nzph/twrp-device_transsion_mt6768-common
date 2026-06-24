@@ -1,10 +1,11 @@
 import /init.recovery.trustonic.rc
 
-on boot
-    write /sys/class/usb_role/mt_usb-role-switch/role device
-
 on init
     export LD_LIBRARY_PATH /system/lib64:/vendor/lib64:/vendor/lib64/hw:/system/lib64/hw
+
+    # WAIT for USB role node (critical for MT6768)
+    wait /sys/class/usb_role/mt_usb-role-switch/role
+
 
 on fs
     mkdir /mnt/vendor/persist 0771 system system
@@ -12,12 +13,23 @@ on fs
     mkdir /mnt/vendor/persist/paytrigger
     mkdir /data/vendor/key_provisioning 0771 system system
     restorecon /mnt/vendor/persist
-    
+
     install_keyring
 
-on init
-    wait /sys/class/usb_role/mt_usb-role-switch/role
+
+on boot
+    # DEFAULT MODE = MTP / ADB (device mode)
+    write /sys/class/usb_role/mt_usb-role-switch/role device
+
+
+on property:sys.usb.otg=1
+    # SWITCH TO OTG HOST MODE
     write /sys/class/usb_role/mt_usb-role-switch/role host
+
+
+on property:sys.usb.otg=0
+    # RETURN TO DEVICE MODE (MTP/ADB)
+    write /sys/class/usb_role/mt_usb-role-switch/role device
 
 
 on post-fs
@@ -30,14 +42,16 @@ on post-fs
     symlink /dev/block/mmcblk0boot1 /dev/block/by-name/preloader_b
 
     exec u:r:update_engine:s0 root root -- /system/bin/mtk_plpath_utils
-    
+
     start mtk.plpath.utils.link
+
 
 on property:persist.vendor.mtk.pl_lnk=1
     symlink /dev/block/mapper/pl_a /dev/block/by-name/preloader_raw_a
     symlink /dev/block/mapper/pl_b /dev/block/by-name/preloader_raw_b
     symlink /dev/block/mapper/pl_a /dev/block/platform/bootdevice/by-name/preloader_raw_a
     symlink /dev/block/mapper/pl_b /dev/block/platform/bootdevice/by-name/preloader_raw_b
+
 
 service mtk.plpath.utils.link /system/bin/mtk_plpath_utils
     class main
@@ -47,6 +61,7 @@ service mtk.plpath.utils.link /system/bin/mtk_plpath_utils
     oneshot
     seclabel u:r:recovery:s0
 
+
 service keystore_auth /system/bin/keystore_auth
     oneshot
     user system
@@ -54,11 +69,13 @@ service keystore_auth /system/bin/keystore_auth
     disabled
     seclabel u:r:recovery:s0
 
+
 service keystore /system/bin/keystore /tmp/misc/keystore
     user root
     group root drmrpc readproc log
     disabled
     seclabel u:r:recovery:s0
+
 
 service tee-1-1 /vendor/bin/vendor.trustonic.tee@1.1-service
     class hal
@@ -67,12 +84,14 @@ service tee-1-1 /vendor/bin/vendor.trustonic.tee@1.1-service
     disabled
     seclabel u:r:recovery:s0
 
+
 service vendor.keymaster-4-1-trustonic /vendor/bin/android.hardware.keymaster@4.1-service.trustonic
     class early_hal
     user root
     group root drmrpc
     disabled
     seclabel u:r:recovery:s0
+
 
 service vendor.gatekeeper-1-0 /vendor/bin/android.hardware.gatekeeper@1.0-service
     interface android.hardware.gatekeeper@1.0::IGatekeeper default
@@ -82,6 +101,7 @@ service vendor.gatekeeper-1-0 /vendor/bin/android.hardware.gatekeeper@1.0-servic
     disabled
     seclabel u:r:recovery:s0
 
+
 on property:hwservicemanager.ready=true
     write /proc/bootprof "MOBICORE: create /data/vendor/mcRegistry ++ (FBE encrypted)"
     mkdir /data/vendor/mcRegistry 0775 system system
@@ -90,6 +110,7 @@ on property:hwservicemanager.ready=true
     start tee-1-1
     start vendor.keymaster-4-1-trustonic
     start vendor.gatekeeper-1-0
+
 
 on property:ro.crypto.state=unsupported
     write /proc/bootprof "MOBICORE: create /data/vendor/mcRegistry ++ (unencrypted)"
@@ -102,6 +123,7 @@ on property:ro.crypto.state=unsupported
     stop servicemanager
     stop hwservicemanager
 
+
 on property:ro.crypto.type=file && property:ro.crypto.state=unencrypted
     write /proc/bootprof "MOBICORE: create /data/vendor/mcRegistry ++ (unencrypted)"
     mkdir /data/vendor/mcRegistry 0775 system system
@@ -113,6 +135,7 @@ on property:ro.crypto.type=file && property:ro.crypto.state=unencrypted
     stop servicemanager
     stop hwservicemanager
 
+
 on property:twrp.decrypt.done=true && property:twrp.all.users.decrypted=true
     stop mobicore
     stop tee-1-1
@@ -121,10 +144,12 @@ on property:twrp.decrypt.done=true && property:twrp.all.users.decrypted=true
     stop servicemanager
     stop hwservicemanager
 
+
 on post-fs-data
     mkdir /data/vendor_de 0770 system system
-    mkdir /data/vendor_de/0 0770 system system 
+    mkdir /data/vendor_de/0 0770 system system
+
 
 on boot
-     start boot-hal-1-1
-     start health-hal-2-1
+    start boot-hal-1-1
+    start health-hal-2-1
