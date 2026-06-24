@@ -186,15 +186,15 @@ TW_MAX_BRIGHTNESS := 2047
 TW_DEFAULT_BRIGHTNESS := 1200
 
 # USB Configuration
-TW_EXCLUDE_DEFAULT_USB_INIT := true
+# TW_EXCLUDE_DEFAULT_USB_INIT := true
 TARGET_USE_CUSTOM_LUN_FILE_PATH := /config/usb_gadget/g1/functions/mass_storage.0/lun.%d/file
 TW_HAS_NO_RECOVERY_PARTITION := true
 TW_USES_OTG_USB := true
-TW_NO_USB_STORAGE := true
+# TW_NO_USB_STORAGE := true
 
 # MTP
 TW_HAS_MTP := true
-TW_MTP_DEVICE := /dev/mtp_usb
+# TW_MTP_DEVICE := /dev/mtp_usb
 
 # Storage
 RECOVERY_SDCARD_ON_DATA := true
