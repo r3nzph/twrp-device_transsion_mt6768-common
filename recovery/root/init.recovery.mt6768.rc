@@ -3,8 +3,10 @@ import /init.recovery.trustonic.rc
 on init
     export LD_LIBRARY_PATH /system/lib64:/vendor/lib64:/vendor/lib64/hw:/system/lib64/hw
 
-    # WAIT for USB role node (critical for MT6768)
-    wait /sys/class/usb_role/mt_usb-role-switch/role
+    # ===== STOCK MTK USB INIT (RESTORED) =====
+    setprop sys.usb.configfs 1
+    setprop sys.usb.controller musb-hdrc
+    setprop sys.usb.ffs.aio_compat 0
 
 
 on fs
@@ -16,20 +18,8 @@ on fs
 
     install_keyring
 
-
-on boot
-    # DEFAULT MODE = MTP / ADB (device mode)
-    write /sys/class/usb_role/mt_usb-role-switch/role device
-
-
-on property:sys.usb.otg=1
-    # SWITCH TO OTG HOST MODE
-    write /sys/class/usb_role/mt_usb-role-switch/role host
-
-
-on property:sys.usb.otg=0
-    # RETURN TO DEVICE MODE (MTP/ADB)
-    write /sys/class/usb_role/mt_usb-role-switch/role device
+    write /sys/class/power_supply/usb/otg_switch 1
+    write /sys/class/oplus_chg/usb/otg_switch 1
 
 
 on post-fs
@@ -147,9 +137,32 @@ on property:twrp.decrypt.done=true && property:twrp.all.users.decrypted=true
 
 on post-fs-data
     mkdir /data/vendor_de 0770 system system
-    mkdir /data/vendor_de/0 0770 system system
+    mkdir /data/vendor_de/0 0770 system system 
 
 
 on boot
-    start boot-hal-1-1
-    start health-hal-2-1
+     start boot-hal-1-1
+     start health-hal-2-1
+
+
+# ===== ADDED (STOCK USB BEHAVIOR FIX) =====
+
+on boot
+    # force correct USB controller mode (stock behavior)
+    setprop sys.usb.configfs 1
+    setprop sys.usb.controller musb-hdrc
+    setprop sys.usb.state mtp,adb
+
+    # ensure OTG state is not stuck
+    write /sys/class/usb_role/mt_usb-role-switch/role device
+
+
+on fs && property:ro.debuggable=0
+    # stock MTK CDP/SDP behavior
+    write /sys/class/udc/musb-hdrc/device/cmode 2
+    start adbd
+
+
+on property:sys.usb.config=mtp,adb
+    # stabilize MTP (prevents "usbd stopped")
+    setprop sys.usb.state mtp,adb
