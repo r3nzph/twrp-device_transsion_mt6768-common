@@ -62,7 +62,6 @@ TW_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES += \
     $(TARGET_OUT_SHARED_LIBRARIES)/libgatekeeper_aidl.so \
     $(TARGET_OUT_SHARED_LIBRARIES)/libkeymaster41.so \
     $(TARGET_OUT_SHARED_LIBRARIES)/libpuresoftkeymasterdevice.so
-    $(TARGET_OUT_SHARED_LIBRARIES)/android.hardware.keymaster@4.1
 
 # Additional binaries & libraries needed for recovery
 TARGET_RECOVERY_DEVICE_MODULES += \
@@ -70,4 +69,3 @@ TARGET_RECOVERY_DEVICE_MODULES += \
     libgatekeeper_aidl \
     libkeymaster41 \
     libpuresoftkeymasterdevice
-    android.hardware.keymaster@4.1
