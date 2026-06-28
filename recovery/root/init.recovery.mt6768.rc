@@ -48,3 +48,27 @@ service mtk.plpath.utils.link /system/bin/mtk_plpath_utils
 on post-fs-data
     mkdir /data/vendor_de 0770 system system
     mkdir /data/vendor_de/0 0770 system system
+
+on init
+    start vold
+
+service vold /system/bin/vold
+    class core
+    socket vold stream 0660 root mount
+    group root mount
+
+service keymaster /vendor/bin/hw/android.hardware.keymaster@4.1-service.trustonic
+    class hal
+    user system
+    group system drmrpc
+
+service gatekeeper /vendor/bin/hw/android.hardware.gatekeeper@1.0-service
+    class hal
+    user system
+    group system drmrpc
+
+on property:ro.crypto.state=encrypted
+    start vold
+
+on property:vold.decrypt=trigger_restart_framework
+    class_start main
