@@ -108,3 +108,9 @@ PRODUCT_PACKAGES += \
 TARGET_RECOVERY_DEVICE_MODULES += \
     android.hardware.gatekeeper@1.0 \
     android.hardware.keymaster@4.1
+
+# Keymaster (REAL from your dump)
+PRODUCT_PACKAGES += \
+    libkeymaster4_1support \
+    libpuresoftkeymasterdevice \
+    android.hardware.keymaster@4.1-service.trustonic
