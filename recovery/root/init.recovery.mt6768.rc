@@ -72,3 +72,7 @@ on property:ro.crypto.state=encrypted
 
 on property:vold.decrypt=trigger_restart_framework
     class_start main
+
+on property:hwservicemanager.ready=true
+    start vendor.keymaster-4-1-trustonic
+    start vendor.gatekeeper-1-0
