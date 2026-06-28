@@ -11,17 +11,11 @@ on fs
     mkdir /data/vendor/key_provisioning 0771 system system
     restorecon /mnt/vendor/persist
 
-    install_keyring
-
     write /sys/class/power_supply/usb/otg_switch 1
 
 on post-fs
-    # Support A/B feature for EMMC and UFS boot region
     symlink /dev/block/sda /dev/block/mmcblk0boot0
     symlink /dev/block/sdb /dev/block/mmcblk0boot1
-
-    symlink /dev/block/mmcblk0boot0 /dev/block/platform/bootdevice/by-name/preloader_a
-    symlink /dev/block/mmcblk0boot1 /dev/block/platform/bootdevice/by-name/preloader_b
 
     symlink /dev/block/mmcblk0boot0 /dev/block/by-name/preloader_a
     symlink /dev/block/mmcblk0boot1 /dev/block/by-name/preloader_b
@@ -34,45 +28,40 @@ on property:persist.vendor.mtk.pl_lnk=1
     symlink /dev/block/mapper/pl_a /dev/block/by-name/preloader_raw_a
     symlink /dev/block/mapper/pl_b /dev/block/by-name/preloader_raw_b
 
-    symlink /dev/block/mapper/pl_a /dev/block/platform/bootdevice/by-name/preloader_raw_a
-    symlink /dev/block/mapper/pl_b /dev/block/platform/bootdevice/by-name/preloader_raw_b
-
-service mtk.plpath.utils.link /system/bin/mtk_plpath_utils
-    class main
-    user root
-    group root system
-    disabled
-    oneshot
-    seclabel u:r:recovery:s0
-
 on post-fs-data
     mkdir /data/vendor_de 0770 system system
     mkdir /data/vendor_de/0 0770 system system
 
-on init
-    start vold
+# ============================
+# KEYMASTER / GATEKEEPER
+# ============================
 
-service vold /system/bin/vold
-    class core
-    socket vold stream 0660 root mount
-    group root mount
+service vendor.keymaster-4-1-trustonic /vendor/bin/hw/android.hardware.keymaster@4.1-service.trustonic
+    class early_hal
+    user root
+    group root drmrpc
+    seclabel u:r:recovery:s0
+    disabled
 
-service keymaster /vendor/bin/hw/android.hardware.keymaster@4.1-service.trustonic
+service vendor.gatekeeper-1-0 /vendor/bin/hw/android.hardware.gatekeeper@1.0-service
     class hal
-    user system
-    group system drmrpc
-
-service gatekeeper /vendor/bin/hw/android.hardware.gatekeeper@1.0-service
-    class hal
-    user system
-    group system drmrpc
-
-on property:ro.crypto.state=encrypted
-    start vold
-
-on property:vold.decrypt=trigger_restart_framework
-    class_start main
+    user root
+    group root drmrpc
+    seclabel u:r:recovery:s0
+    disabled
 
 on property:hwservicemanager.ready=true
     start vendor.keymaster-4-1-trustonic
     start vendor.gatekeeper-1-0
+
+# ============================
+# VOLD (START LATE)
+# ============================
+
+service vold /system/bin/vold
+    class late_start
+    socket vold stream 0660 root mount
+    group root mount
+
+on property:vold.decrypt=trigger_restart_framework
+    class_start main
