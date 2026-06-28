@@ -29,4 +29,3 @@ ro.vendor.mtk_trustonic_tee_support=1
 # Gatekeeper / Keymaster
 # =========================
 ro.hardware.gatekeeper=trustonic
-keymaster_ver=4.1
