@@ -56,16 +56,10 @@ PRODUCT_PACKAGES += \
     update_verifier \
     update_engine_sideload
 
-# Additional configs
-TW_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES += \
-    $(TARGET_OUT_SHARED_LIBRARIES)/libgatekeeper.so \
-    $(TARGET_OUT_SHARED_LIBRARIES)/libgatekeeper_aidl.so \
-    $(TARGET_OUT_SHARED_LIBRARIES)/libkeymaster41.so \
-    $(TARGET_OUT_SHARED_LIBRARIES)/libpuresoftkeymasterdevice.so
+# Crypto
+PRODUCT_PACKAGES += \
+    android.system.keystore2
 
-# Additional binaries & libraries needed for recovery
 TARGET_RECOVERY_DEVICE_MODULES += \
-    libgatekeeper \
-    libgatekeeper_aidl \
-    libkeymaster41 \
-    libpuresoftkeymasterdevice
+    android.hardware.gatekeeper@1.0 \
+    android.hardware.keymaster@4.1
