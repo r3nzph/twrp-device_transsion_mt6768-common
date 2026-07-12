@@ -37,11 +37,17 @@ ALLOW_MISSING_DEPENDENCIES := true
 TARGET_SCREEN_DENSITY := 320
 TW_THEME := portrait_hdpi
 
+# DRM/Display fix for splash freeze: load drm modules before graphics init
+TW_GRAPHICS_FORCE_USE_DRM := true
+TW_LOAD_VENDOR_BOOT_MODULES := true
+
 # Assert
 TARGET_OTA_ASSERT_DEVICE := KJ5
 
 # DTBO
 BOARD_KERNEL_SEPARATED_DTBO := true
+BOARD_INCLUDE_DTB_IN_BOOTIMG := true
+BOARD_PREBUILT_DTBOIMAGE := $(DEVICE_PATH)/prebuilt/dtbo.img
 
 # Kernel
 TARGET_NO_KERNEL := true
@@ -57,7 +63,7 @@ BOARD_TAGS_OFFSET := 0x0bc08000
 BOARD_RAMDISK_OFFSET := 0x07c08000
 BOARD_DTB_SIZE := 182209
 BOARD_DTB_OFFSET := 0x0bc08000
-BOARD_HEADER_SIZE = 2128
+BOARD_HEADER_SIZE := 2128
 BOARD_VENDOR_CMDLINE := bootopt=64S3,32N2,64N2
 BOARD_VENDOR_BASE := 0x40078000
 
@@ -67,16 +73,26 @@ BOARD_MKBOOTIMG_ARGS += --kernel_offset $(BOARD_KERNEL_OFFSET)
 BOARD_MKBOOTIMG_ARGS += --ramdisk_offset $(BOARD_RAMDISK_OFFSET)
 BOARD_MKBOOTIMG_ARGS += --tags_offset $(BOARD_TAGS_OFFSET)
 BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOT_HEADER_VERSION)
+BOARD_MKBOOTIMG_ARGS += --header_size $(BOARD_HEADER_SIZE)
 BOARD_MKBOOTIMG_ARGS += --dtb_offset $(BOARD_DTB_OFFSET)
 BOARD_MKBOOTIMG_ARGS += --dtb $(TARGET_PREBUILT_DTB)
 
 # Partitions
 BOARD_FLASH_BLOCK_SIZE := 262144
-BOARD_VENDOR_BOOTIMAGE_PARTITION_SIZE := 67108864
 
+BOARD_SUPER_PARTITION_BLOCK_DEVICES := super
+BOARD_SUPER_PARTITION_METADATA_DEVICE := super
 BOARD_SUPER_PARTITION_GROUPS := main
 BOARD_MAIN_SIZE := 9122611200
 BOARD_SUPER_PARTITIONS_SIZE := 9122611200
+BOARD_SUPER_IMAGE_SIZE := 9122611200
+BOARD_EXT4_SHARE_DUP_BLOCKS := true
+
+# DTBO partition size (required for BOARD_KERNEL_SEPARATED_DTBO)
+BOARD_DTBOIMG_PARTITION_SIZE := 8388608
+
+# Boot image partition size (required for A/B updates)
+BOARD_BOOTIMAGE_PARTITION_SIZE := 33554432
 
 BOARD_MAIN_PARTITION_LIST += \
     product \
@@ -96,6 +112,7 @@ TARGET_USERIMAGES_USE_EXT4 := true
 TARGET_USERIMAGES_USE_F2FS := true
 
 BOARD_USES_METADATA_PARTITION := true
+BOARD_USES_VENDORIMAGE := true
 
 # Output paths
 TARGET_COPY_OUT_PRODUCT := product
@@ -115,12 +132,14 @@ BOARD_USES_RECOVERY_AS_VENDOR_BOOT := true
 BOARD_USES_GENERIC_KERNEL_IMAGE := true
 
 TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
+
+# Graphics Backend (DRM required for Android 13 MTK kernels)
+TW_GRAPHICS_BACKEND := "drm"
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery/root/system/etc/recovery.fstab
 BOARD_HAS_LARGE_FILESYSTEM := true
 
 BOARD_HAS_NO_SELECT_BUTTON  := true
 BOARD_SUPPRESS_SECURE_ERASE := true
-BOARD_USES_METADATA_PARTITION := true
 
 # Verified Boot
 BOARD_AVB_ENABLE := true
@@ -140,14 +159,23 @@ BOOT_SECURITY_PATCH := $(PLATFORM_SECURITY_PATCH)
 # Crypto
 TW_INCLUDE_CRYPTO := true
 TW_INCLUDE_CRYPTO_FBE := true
-TW_USE_FSCRYPT_POLICY := 2
 TW_INCLUDE_FBE_METADATA_DECRYPT := true
-TW_KEYMASTER_VERSION := 4.1
+TW_PREPARE_DATA_MEDIA_EARLY := true
+TW_REQUIRE_FBE := true
 
-# IMPORTANT for MTK broken keymaster devices
-TW_NO_LEGACY_PROPS := true
+TW_FORCE_KEYMASTER_VER := 4
 
-TW_LOAD_VENDOR_BOOT_MODULES := true
+# Android 13 vold-based decryption
+TW_CRYPTO_USE_SYSTEM_VOLD := true
+TW_CRYPTO_SYSTEM_VOLD_DECRYPT := true
+TW_CRYPTO_SYSTEM_VOLD_KEY_PATH := "/metadata/vold/metadata_encryption"
+
+# Modules - vendor_boot modules loaded for display/touch
+# TW_LOAD_VENDOR_BOOT_MODULES := true (already set in Display Settings section)
+TW_LOAD_VENDOR_MODULES := "mediatek-drm.ko mtk_panel_ext.ko pwm-mtk-disp.ko leds-mtk-disp.ko tran_drm_panel_i2c.ko"
+
+# Mount behavior
+TW_TARGET_USES_MOUNT := true 
 
 # Debug
 TWRP_INCLUDE_LOGCAT := true
@@ -165,11 +193,12 @@ TW_USE_TOOLBOX := true
 TW_INCLUDE_FUSE_EXFAT := true
 TW_INCLUDE_EXFAT := true
 TW_INCLUDE_BASH := true
+TW_INCLUDE_SUPERSU := true
 TW_INCLUDE_LPDUMP := true
 TARGET_USES_MKE2FS := true
 
 # TWRP Configuration
-TW_FRAMERATE := 90
+TW_FRAMERATE := 60
 TW_EXTRA_LANGUAGES := true
 TW_SCREEN_BLANK_ON_BOOT := true
 TW_INPUT_BLACKLIST := "hbtp_vm"
@@ -179,14 +208,20 @@ TW_EXCLUDE_PYTHON := true
 TW_EXCLUDE_TWRPAPP := true
 TW_NO_FASTBOOT_BOOT := true
 
+# Disable forced encryption prompts (handled by FBE)
+TW_NO_LEGACY_PROPS := true
+
 # Brightness Screen
-TW_NO_SCREEN_BLANK := true
+# NOTE: Do NOT set TW_NO_SCREEN_BLANK with TW_SCREEN_BLANK_ON_BOOT
+# as they conflict. We keep TW_SCREEN_BLANK_ON_BOOT to keep display on
+# during boot and allow blanking after.
+# TW_NO_SCREEN_BLANK := true
 TW_BRIGHTNESS_PATH := "/sys/class/backlight/panel/brightness"
 TW_MAX_BRIGHTNESS := 2047
 TW_DEFAULT_BRIGHTNESS := 1200
 
 # USB Configuration
-# TW_EXCLUDE_DEFAULT_USB_INIT := true
+TW_EXCLUDE_DEFAULT_USB_INIT := true
 TARGET_USE_CUSTOM_LUN_FILE_PATH := /config/usb_gadget/g1/functions/mass_storage.0/lun.%d/file
 TW_HAS_NO_RECOVERY_PARTITION := true
 TW_USES_OTG_USB := true
@@ -194,7 +229,7 @@ TW_USES_OTG_USB := true
 
 # MTP
 TW_HAS_MTP := true
-TW_MTP_DEVICE := /dev/mtp_usb
+# TW_MTP_DEVICE := /dev/mtp_usb
 
 # Storage
 RECOVERY_SDCARD_ON_DATA := true
@@ -212,5 +247,10 @@ TW_CUSTOM_CPU_POS := "300"
 TW_CUSTOM_CLOCK_POS := "70"
 TW_CUSTOM_BATTERY_POS := "790"
 
-# Device 
-TW_DEVICE_VERSION := SPARK 20 by r3nzph
+# Device Version
+TW_DEVICE_VERSION := Spark 20 (KJ5)
+
+# === VENDOR BOOT CONFIGURATION ===
+# With boot header v4, recovery ramdisk is placed inside vendor_boot
+BOARD_VENDOR_BOOTIMAGE_PARTITION_RESERVED_SIZE := 0
+BOARD_USES_VENDOR_BOOTIMAGE := true

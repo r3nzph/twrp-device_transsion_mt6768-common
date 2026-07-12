@@ -15,12 +15,19 @@ ro.debuggable=1
 # =========================
 persist.sys.isUsbOtgEnabled=true
 
-# Crypto
-# ro.crypto.volume.filenames_mode=aes-256-cts
-# ro.crypto.support_metadata_encrypt=true
+# =========================
+# CRYPTO - FBE v2 + Metadata Encryption
+# These tell TWRP and vold that FBE is the expected encryption type.
+# ro.crypto.type=file tells the system to use file-based encryption.
+# ro.crypto.state=encrypted tells TWRP to attempt decryption.
+# =========================
+ro.crypto.type=file
+ro.crypto.state=encrypted
+ro.crypto.volume.filenames_mode=aes-256-cts
+ro.crypto.fs_crypto_level=1
 
 # =========================
-# TEE (SAFE KEEP)
+# TEE (TRUSTONIC SECURE WORLD)
 # =========================
 ro.vendor.mtk_tee_gp_support=1
 ro.vendor.mtk_trustonic_tee_support=1
@@ -29,3 +36,16 @@ ro.vendor.mtk_trustonic_tee_support=1
 # Gatekeeper / Keymaster
 # =========================
 ro.hardware.gatekeeper=trustonic
+keymaster_ver=4.1
+
+# =========================
+# FSCRYPT
+# =========================
+ro.crypto.support_metadata_encrypt=true
+
+# =========================
+# MEDIATEK PLATFORM
+# =========================
+ro.vendor.mtk_protected_screen=1
+ro.vendor.mtk_md_sbp_support=2
+ro.vendor.mtk_md1_sbp_custom_value=8

@@ -12,11 +12,17 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/emulated_storage.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/launch_with_vendor_ramdisk.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/compression.mk)
 
+# Android 13 API level
+PRODUCT_SHIPPING_API_LEVEL := 33
+
 # Inherit some common twrp stuff.
 $(call inherit-product, vendor/twrp/config/common.mk)
 
 # Inherit from KJ5 device
 $(call inherit-product, device/tecno/KJ5/device.mk)
+
+# Inherit vendor blobs (keymaster, gatekeeper, vold, health HAL)
+$(call inherit-product-if-exists, device/tecno/KJ5/vendor-blobs.mk)
 
 # Dynamic Partitions
 PRODUCT_USE_DYNAMIC_PARTITIONS := true
