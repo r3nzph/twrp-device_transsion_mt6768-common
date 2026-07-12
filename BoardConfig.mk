@@ -128,7 +128,7 @@ BOARD_VNDK_VERSION := current
 # System SDK version must match PRODUCT_SHIPPING_API_LEVEL (33)
 # to avoid build error: "BOARD_SYSTEMSDK_VERSIONS (32) must all be greater
 # than or equal to PRODUCT_SHIPPING_API_LEVEL (33)"
-BOARD_SYSTEMSDK_VERSIONS := 33
+# BOARD_SYSTEMSDK_VERSIONS := 33
 
 # Recovery Settings
 TARGET_NO_RECOVERY := true
