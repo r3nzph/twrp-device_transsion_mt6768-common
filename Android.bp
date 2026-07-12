@@ -2,10 +2,8 @@
 // Android.bp — TECNO Spark 20 (KJ5 / MT6768)
 //
 // Prebuilt module definitions for VENDOR-SPECIFIC proprietary
-// blobs ONLY. These modules do NOT exist in AOSP source and
-// must be extracted from the stock ROM.
+// blobs ONLY. These modules do NOT exist in AOSP source.
 //
-// Auto-generated from firmware dump at dumps.tadiphone.dev
 // Android 13 — Trustonic TEE — FBE v2 + metadata encryption
 //
 // IMPORTANT: Do NOT duplicate AOSP module names here (e.g.
@@ -14,9 +12,9 @@
 // device.mk and would cause Soong "module already defined"
 // errors.
 //
-// Blobs should be placed at:
-//   vendor/tecno/KJ5/proprietary/<path>
-// Run ./extract-files.sh to populate them.
+// Blobs are placed at:
+//   recovery/root/vendor/<path>
+// and are directly included in the vendor_boot ramdisk.
 // ============================================================
 
 // ============================================================
@@ -26,7 +24,7 @@
 
 cc_prebuilt_binary {
     name: "vendor.trustonic.mcDriverDaemon",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/bin/mcDriverDaemon"],
+    srcs: ["recovery/root/vendor/bin/mcDriverDaemon"],
     vendor: true,
     relative_install_path: "bin",
     stem: "mcDriverDaemon",
@@ -36,7 +34,7 @@ cc_prebuilt_binary {
 
 cc_prebuilt_binary {
     name: "vendor.trustonic.kmsetkey_ca",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/bin/kmsetkey_ca.trustonic"],
+    srcs: ["recovery/root/vendor/bin/kmsetkey_ca.trustonic"],
     vendor: true,
     relative_install_path: "bin",
     stem: "kmsetkey_ca.trustonic",
@@ -46,7 +44,7 @@ cc_prebuilt_binary {
 
 cc_prebuilt_binary {
     name: "vendor.trustonic.tee-cmd",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/bin/tee"],
+    srcs: ["recovery/root/vendor/bin/tee"],
     vendor: true,
     relative_install_path: "bin",
     stem: "tee",
@@ -60,7 +58,7 @@ cc_prebuilt_binary {
 
 cc_prebuilt_binary {
     name: "vendor.trustonic.tee@1.1-service",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/bin/hw/vendor.trustonic.tee@1.1-service"],
+    srcs: ["recovery/root/vendor/bin/hw/vendor.trustonic.tee@1.1-service"],
     vendor: true,
     relative_install_path: "bin/hw",
     stem: "vendor.trustonic.tee@1.1-service",
@@ -70,7 +68,7 @@ cc_prebuilt_binary {
 
 cc_prebuilt_library_shared {
     name: "libMcClient",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libMcClient.so"],
+    srcs: ["recovery/root/vendor/lib64/libMcClient.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -79,7 +77,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "libTEECommon",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libTEECommon.so"],
+    srcs: ["recovery/root/vendor/lib64/libTEECommon.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -88,7 +86,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.trustonic.tee@1.0",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/vendor.trustonic.tee@1.0.so"],
+    srcs: ["recovery/root/vendor/lib64/vendor.trustonic.tee@1.0.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -97,7 +95,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.trustonic.tee@1.1",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/vendor.trustonic.tee@1.1.so"],
+    srcs: ["recovery/root/vendor/lib64/vendor.trustonic.tee@1.1.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -106,7 +104,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.trustonic.tee.tui",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/vendor.trustonic.tee.tui@1.0.so"],
+    srcs: ["recovery/root/vendor/lib64/vendor.trustonic.tee.tui@1.0.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -115,7 +113,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.trustonic.kmsetkey-hw",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/hw/kmsetkey.trustonic.so"],
+    srcs: ["recovery/root/vendor/lib64/hw/kmsetkey.trustonic.so"],
     vendor: true,
     relative_install_path: "lib64/hw",
     stem: "kmsetkey.trustonic",
@@ -125,7 +123,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.trustonic.paytrigger-hw",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/hw/paytrigger.trustonic.so"],
+    srcs: ["recovery/root/vendor/lib64/hw/paytrigger.trustonic.so"],
     vendor: true,
     relative_install_path: "lib64/hw",
     stem: "paytrigger.trustonic",
@@ -139,7 +137,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_binary {
     name: "android.hardware.keymaster@4.1-service.trustonic",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/bin/hw/android.hardware.keymaster@4.1-service.trustonic"],
+    srcs: ["recovery/root/vendor/bin/hw/android.hardware.keymaster@4.1-service.trustonic"],
     vendor: true,
     relative_install_path: "bin/hw",
     stem: "android.hardware.keymaster@4.1-service.trustonic",
@@ -150,7 +148,7 @@ cc_prebuilt_binary {
 // Keymaster HIDL interface libraries (vendor copies)
 cc_prebuilt_library_shared {
     name: "vendor.android.hardware.keymaster@3.0",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/android.hardware.keymaster@3.0.so"],
+    srcs: ["recovery/root/vendor/lib64/android.hardware.keymaster@3.0.so"],
     vendor: true,
     relative_install_path: "lib64",
     stem: "android.hardware.keymaster@3.0",
@@ -160,7 +158,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.android.hardware.keymaster@4.0",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/android.hardware.keymaster@4.0.so"],
+    srcs: ["recovery/root/vendor/lib64/android.hardware.keymaster@4.0.so"],
     vendor: true,
     relative_install_path: "lib64",
     stem: "android.hardware.keymaster@4.0",
@@ -170,7 +168,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.android.hardware.keymaster@4.1",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/android.hardware.keymaster@4.1.so"],
+    srcs: ["recovery/root/vendor/lib64/android.hardware.keymaster@4.1.so"],
     vendor: true,
     relative_install_path: "lib64",
     stem: "android.hardware.keymaster@4.1",
@@ -180,7 +178,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "libkeymaster41",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libkeymaster41.so"],
+    srcs: ["recovery/root/vendor/lib64/libkeymaster41.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -189,7 +187,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "libpuresoftkeymasterdevice",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libpuresoftkeymasterdevice.so"],
+    srcs: ["recovery/root/vendor/lib64/libpuresoftkeymasterdevice.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -198,7 +196,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "libkeymaster_messages",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libkeymaster_messages.so"],
+    srcs: ["recovery/root/vendor/lib64/libkeymaster_messages.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -207,7 +205,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "libkeymaster_portable",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libkeymaster_portable.so"],
+    srcs: ["recovery/root/vendor/lib64/libkeymaster_portable.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -216,7 +214,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "libsoft_attestation_cert",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libsoft_attestation_cert.so"],
+    srcs: ["recovery/root/vendor/lib64/libsoft_attestation_cert.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -225,7 +223,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "libcppbor_external",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libcppbor_external.so"],
+    srcs: ["recovery/root/vendor/lib64/libcppbor_external.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -234,7 +232,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "libcppcose_rkp",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libcppcose_rkp.so"],
+    srcs: ["recovery/root/vendor/lib64/libcppcose_rkp.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -243,7 +241,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.mediatek.hardware.keymaster_attestation@1.0",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/vendor.mediatek.hardware.keymaster_attestation@1.0.so"],
+    srcs: ["recovery/root/vendor/lib64/vendor.mediatek.hardware.keymaster_attestation@1.0.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -252,7 +250,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.mediatek.hardware.keymaster_attestation@1.1",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/vendor.mediatek.hardware.keymaster_attestation@1.1.so"],
+    srcs: ["recovery/root/vendor/lib64/vendor.mediatek.hardware.keymaster_attestation@1.1.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -261,7 +259,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.mediatek.hardware.keymaster_attestation@1.1-impl",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/hw/vendor.mediatek.hardware.keymaster_attestation@1.1-impl.so"],
+    srcs: ["recovery/root/vendor/lib64/hw/vendor.mediatek.hardware.keymaster_attestation@1.1-impl.so"],
     vendor: true,
     relative_install_path: "lib64/hw",
     stem: "vendor.mediatek.hardware.keymaster_attestation@1.1-impl",
@@ -272,7 +270,7 @@ cc_prebuilt_library_shared {
 // Additional keymaster support libraries found in firmware
 cc_prebuilt_library_shared {
     name: "libkeymaster4",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libkeymaster4.so"],
+    srcs: ["recovery/root/vendor/lib64/libkeymaster4.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -281,7 +279,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "libkeymaster4support",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libkeymaster4support.so"],
+    srcs: ["recovery/root/vendor/lib64/libkeymaster4support.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -290,7 +288,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "libkeymaster4_1support",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libkeymaster4_1support.so"],
+    srcs: ["recovery/root/vendor/lib64/libkeymaster4_1support.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -303,7 +301,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_binary {
     name: "vendor.gatekeeper.trustonic",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/bin/hw/android.hardware.gatekeeper@1.0-service"],
+    srcs: ["recovery/root/vendor/bin/hw/android.hardware.gatekeeper@1.0-service"],
     vendor: true,
     relative_install_path: "bin/hw",
     stem: "android.hardware.gatekeeper@1.0-service",
@@ -313,7 +311,7 @@ cc_prebuilt_binary {
 
 cc_prebuilt_library_shared {
     name: "vendor.android.hardware.gatekeeper@1.0",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/android.hardware.gatekeeper@1.0.so"],
+    srcs: ["recovery/root/vendor/lib64/android.hardware.gatekeeper@1.0.so"],
     vendor: true,
     relative_install_path: "lib64",
     stem: "android.hardware.gatekeeper@1.0",
@@ -324,7 +322,7 @@ cc_prebuilt_library_shared {
 // Gatekeeper implementation from firmware
 cc_prebuilt_library_shared {
     name: "vendor.gatekeeper.impl",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/hw/android.hardware.gatekeeper@1.0-impl.so"],
+    srcs: ["recovery/root/vendor/lib64/hw/android.hardware.gatekeeper@1.0-impl.so"],
     vendor: true,
     relative_install_path: "lib64/hw",
     stem: "android.hardware.gatekeeper@1.0-impl",
@@ -334,7 +332,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "libMcGatekeeper",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/hw/libMcGatekeeper.so"],
+    srcs: ["recovery/root/vendor/lib64/hw/libMcGatekeeper.so"],
     vendor: true,
     relative_install_path: "lib64/hw",
     stem: "libMcGatekeeper",
@@ -344,7 +342,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "libSoftGatekeeper",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/hw/libSoftGatekeeper.so"],
+    srcs: ["recovery/root/vendor/lib64/hw/libSoftGatekeeper.so"],
     vendor: true,
     relative_install_path: "lib64/hw",
     stem: "libSoftGatekeeper",
@@ -358,7 +356,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.android.system.wifi.keystore",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/android.system.wifi.keystore@1.0.so"],
+    srcs: ["recovery/root/vendor/lib64/android.system.wifi.keystore@1.0.so"],
     vendor: true,
     relative_install_path: "lib64",
     stem: "android.system.wifi.keystore@1.0",
@@ -368,7 +366,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.libkeystore-engine-wifi-hidl",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libkeystore-engine-wifi-hidl.so"],
+    srcs: ["recovery/root/vendor/lib64/libkeystore-engine-wifi-hidl.so"],
     vendor: true,
     relative_install_path: "lib64",
     stem: "libkeystore-engine-wifi-hidl",
@@ -378,7 +376,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.libkeystore-wifi-hidl",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libkeystore-wifi-hidl.so"],
+    srcs: ["recovery/root/vendor/lib64/libkeystore-wifi-hidl.so"],
     vendor: true,
     relative_install_path: "lib64",
     stem: "libkeystore-wifi-hidl",
@@ -392,7 +390,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_binary {
     name: "vendor.android.hardware.health@2.1-service",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/bin/hw/android.hardware.health@2.1-service"],
+    srcs: ["recovery/root/vendor/bin/hw/android.hardware.health@2.1-service"],
     vendor: true,
     relative_install_path: "bin/hw",
     stem: "android.hardware.health@2.1-service",
@@ -402,7 +400,7 @@ cc_prebuilt_binary {
 
 cc_prebuilt_library_shared {
     name: "vendor.android.hardware.health@1.0",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/android.hardware.health@1.0.so"],
+    srcs: ["recovery/root/vendor/lib64/android.hardware.health@1.0.so"],
     vendor: true,
     relative_install_path: "lib64",
     stem: "android.hardware.health@1.0",
@@ -412,7 +410,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.android.hardware.health@2.0",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/android.hardware.health@2.0.so"],
+    srcs: ["recovery/root/vendor/lib64/android.hardware.health@2.0.so"],
     vendor: true,
     relative_install_path: "lib64",
     stem: "android.hardware.health@2.0",
@@ -422,7 +420,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.android.hardware.health@2.1",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/android.hardware.health@2.1.so"],
+    srcs: ["recovery/root/vendor/lib64/android.hardware.health@2.1.so"],
     vendor: true,
     relative_install_path: "lib64",
     stem: "android.hardware.health@2.1",
@@ -432,7 +430,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.android.hardware.health@2.0-impl-2.1",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/hw/android.hardware.health@2.0-impl-2.1.so"],
+    srcs: ["recovery/root/vendor/lib64/hw/android.hardware.health@2.0-impl-2.1.so"],
     vendor: true,
     relative_install_path: "lib64/hw",
     stem: "android.hardware.health@2.0-impl-2.1",
@@ -446,7 +444,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_binary {
     name: "vendor.android.hardware.boot@1.2-service",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/bin/hw/android.hardware.boot@1.2-service"],
+    srcs: ["recovery/root/vendor/bin/hw/android.hardware.boot@1.2-service"],
     vendor: true,
     relative_install_path: "bin/hw",
     stem: "android.hardware.boot@1.2-service",
@@ -456,7 +454,7 @@ cc_prebuilt_binary {
 
 cc_prebuilt_library_shared {
     name: "vendor.android.hardware.boot@1.0",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/android.hardware.boot@1.0.so"],
+    srcs: ["recovery/root/vendor/lib64/android.hardware.boot@1.0.so"],
     vendor: true,
     relative_install_path: "lib64",
     stem: "android.hardware.boot@1.0",
@@ -466,7 +464,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.android.hardware.boot@1.1",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/android.hardware.boot@1.1.so"],
+    srcs: ["recovery/root/vendor/lib64/android.hardware.boot@1.1.so"],
     vendor: true,
     relative_install_path: "lib64",
     stem: "android.hardware.boot@1.1",
@@ -476,7 +474,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.android.hardware.boot@1.2",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/android.hardware.boot@1.2.so"],
+    srcs: ["recovery/root/vendor/lib64/android.hardware.boot@1.2.so"],
     vendor: true,
     relative_install_path: "lib64",
     stem: "android.hardware.boot@1.2",
@@ -486,7 +484,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.android.hardware.boot@1.0-impl-1.2-mtkimpl",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/hw/android.hardware.boot@1.0-impl-1.2-mtkimpl.so"],
+    srcs: ["recovery/root/vendor/lib64/hw/android.hardware.boot@1.0-impl-1.2-mtkimpl.so"],
     vendor: true,
     relative_install_path: "lib64/hw",
     stem: "android.hardware.boot@1.0-impl-1.2-mtkimpl",
@@ -500,7 +498,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_binary {
     name: "mtk_plpath_utils",
-    srcs: ["vendor/tecno/KJ5/proprietary/system/system/bin/mtk_plpath_utils"],
+    srcs: ["recovery/root/vendor/bin/mtk_plpath_utils"],
     relative_install_path: "bin",
     check_elf_files: false,
     recovery_available: true,
@@ -508,7 +506,7 @@ cc_prebuilt_binary {
 
 cc_prebuilt_library_shared {
     name: "libion_mtk",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libion_mtk.so"],
+    srcs: ["recovery/root/vendor/lib64/libion_mtk.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -517,7 +515,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "libmtk_drvb",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/mt6768/libmtk_drvb.so"],
+    srcs: ["recovery/root/vendor/lib64/mt6768/libmtk_drvb.so"],
     vendor: true,
     relative_install_path: "lib64/mt6768",
     stem: "libmtk_drvb",
@@ -527,7 +525,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "libmtkcutils",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libmtkcutils.so"],
+    srcs: ["recovery/root/vendor/lib64/libmtkcutils.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -536,7 +534,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "libmtkhardware_legacy",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libmtkhardware_legacy.so"],
+    srcs: ["recovery/root/vendor/lib64/libmtkhardware_legacy.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -545,7 +543,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "libmtkutils",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libmtkutils.so"],
+    srcs: ["recovery/root/vendor/lib64/libmtkutils.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -554,7 +552,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "libbwc",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libbwc.so"],
+    srcs: ["recovery/root/vendor/lib64/libbwc.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -563,7 +561,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "libgralloc_extra",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libgralloc_extra.so"],
+    srcs: ["recovery/root/vendor/lib64/libgralloc_extra.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -572,7 +570,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "libcomposer_ext",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libcomposer_ext.so"],
+    srcs: ["recovery/root/vendor/lib64/libcomposer_ext.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -581,7 +579,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "libgpu_aux",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libgpu_aux.so"],
+    srcs: ["recovery/root/vendor/lib64/libgpu_aux.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -590,7 +588,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "libcapctrl",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libcapctrl.so"],
+    srcs: ["recovery/root/vendor/lib64/libcapctrl.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -603,7 +601,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.libnvram",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libnvram.so"],
+    srcs: ["recovery/root/vendor/lib64/libnvram.so"],
     vendor: true,
     relative_install_path: "lib64",
     stem: "libnvram",
@@ -613,7 +611,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.libcustom_nvram",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libcustom_nvram.so"],
+    srcs: ["recovery/root/vendor/lib64/libcustom_nvram.so"],
     vendor: true,
     relative_install_path: "lib64",
     stem: "libcustom_nvram",
@@ -623,7 +621,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.libnvram_sec",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libnvram_sec.so"],
+    srcs: ["recovery/root/vendor/lib64/libnvram_sec.so"],
     vendor: true,
     relative_install_path: "lib64",
     stem: "libnvram_sec",
@@ -637,7 +635,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.libcrypto_mdapp",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libcrypto-mdapp.so"],
+    srcs: ["recovery/root/vendor/lib64/libcrypto-mdapp.so"],
     vendor: true,
     relative_install_path: "lib64",
     stem: "libcrypto-mdapp",
@@ -647,7 +645,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.libssl_mdapp",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libssl-mdapp.so"],
+    srcs: ["recovery/root/vendor/lib64/libssl-mdapp.so"],
     vendor: true,
     relative_install_path: "lib64",
     stem: "libssl-mdapp",
@@ -657,7 +655,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.libtrancrypto",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libtrancrypto.so"],
+    srcs: ["recovery/root/vendor/lib64/libtrancrypto.so"],
     vendor: true,
     relative_install_path: "lib64",
     stem: "libtrancrypto",
@@ -667,7 +665,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.libkmsetkey",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libkmsetkey.so"],
+    srcs: ["recovery/root/vendor/lib64/libkmsetkey.so"],
     vendor: true,
     relative_install_path: "lib64",
     stem: "libkmsetkey",
@@ -681,7 +679,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "libtranlog",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libtranlog.so"],
+    srcs: ["recovery/root/vendor/lib64/libtranlog.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -690,7 +688,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "libTran_Log",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libTran_Log.so"],
+    srcs: ["recovery/root/vendor/lib64/libTran_Log.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -699,7 +697,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.transsion.hardware.tranlog",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/vendor.transsion.hardware.tranlog@1.0.so"],
+    srcs: ["recovery/root/vendor/lib64/vendor.transsion.hardware.tranlog@1.0.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -708,7 +706,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.transsion.hardware.tranlogconfig",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/vendor.transsion.hardware.tranlogconfig@1.0.so"],
+    srcs: ["recovery/root/vendor/lib64/vendor.transsion.hardware.tranlogconfig@1.0.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -717,7 +715,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "libTran_mtkPowerAPI",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libTran_mtkPowerAPI.so"],
+    srcs: ["recovery/root/vendor/lib64/libTran_mtkPowerAPI.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -730,7 +728,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.hwcomposer.mt6768",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/hw/hwcomposer.mt6768.so"],
+    srcs: ["recovery/root/vendor/lib64/hw/hwcomposer.mt6768.so"],
     vendor: true,
     relative_install_path: "lib64/hw",
     stem: "hwcomposer.mt6768",
@@ -740,7 +738,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.gralloc.default",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/hw/gralloc.default.so"],
+    srcs: ["recovery/root/vendor/lib64/hw/gralloc.default.so"],
     vendor: true,
     relative_install_path: "lib64/hw",
     stem: "gralloc.default",
@@ -750,7 +748,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.lights.mt6768",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/hw/lights.mt6768.so"],
+    srcs: ["recovery/root/vendor/lib64/hw/lights.mt6768.so"],
     vendor: true,
     relative_install_path: "lib64/hw",
     stem: "lights.mt6768",
@@ -760,7 +758,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.mediatek.hardware.composer_ext",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/vendor.mediatek.hardware.composer_ext@1.0.so"],
+    srcs: ["recovery/root/vendor/lib64/vendor.mediatek.hardware.composer_ext@1.0.so"],
     vendor: true,
     relative_install_path: "lib64",
     check_elf_files: false,
@@ -773,7 +771,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.libhidltransport",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libhidltransport.so"],
+    srcs: ["recovery/root/vendor/lib64/libhidltransport.so"],
     vendor: true,
     relative_install_path: "lib64",
     stem: "libhidltransport",
@@ -783,7 +781,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.libhwbinder",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libhwbinder.so"],
+    srcs: ["recovery/root/vendor/lib64/libhwbinder.so"],
     vendor: true,
     relative_install_path: "lib64",
     stem: "libhwbinder",
@@ -793,7 +791,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.android.hidl.allocator@1.0",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/android.hidl.allocator@1.0.so"],
+    srcs: ["recovery/root/vendor/lib64/android.hidl.allocator@1.0.so"],
     vendor: true,
     relative_install_path: "lib64",
     stem: "android.hidl.allocator@1.0",
@@ -807,7 +805,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.libtneclient",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libtneclient.so"],
+    srcs: ["recovery/root/vendor/lib64/libtneclient.so"],
     vendor: true,
     relative_install_path: "lib64",
     stem: "libtneclient",
@@ -821,7 +819,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.liboemcrypto",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/liboemcrypto.so"],
+    srcs: ["recovery/root/vendor/lib64/liboemcrypto.so"],
     vendor: true,
     relative_install_path: "lib64",
     stem: "liboemcrypto",
@@ -831,7 +829,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.libtlcWidevineModularDrm",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libtlcWidevineModularDrm.so"],
+    srcs: ["recovery/root/vendor/lib64/libtlcWidevineModularDrm.so"],
     vendor: true,
     relative_install_path: "lib64",
     stem: "libtlcWidevineModularDrm",
@@ -841,7 +839,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.libgz_gp_client",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libgz_gp_client.so"],
+    srcs: ["recovery/root/vendor/lib64/libgz_gp_client.so"],
     vendor: true,
     relative_install_path: "lib64",
     stem: "libgz_gp_client",
@@ -851,7 +849,7 @@ cc_prebuilt_library_shared {
 
 cc_prebuilt_library_shared {
     name: "vendor.libgz_uree",
-    srcs: ["vendor/tecno/KJ5/proprietary/vendor/lib64/libgz_uree.so"],
+    srcs: ["recovery/root/vendor/lib64/libgz_uree.so"],
     vendor: true,
     relative_install_path: "lib64",
     stem: "libgz_uree",

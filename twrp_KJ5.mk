@@ -17,9 +17,6 @@ $(call inherit-product, vendor/twrp/config/common.mk)
 # Inherit from KJ5 device
 $(call inherit-product, device/tecno/KJ5/device.mk)
 
-# Inherit vendor blobs (keymaster, gatekeeper, vold, health HAL)
-$(call inherit-product-if-exists, device/tecno/KJ5/vendor-blobs.mk)
-
 # Dynamic Partitions
 PRODUCT_USE_DYNAMIC_PARTITIONS := true
 
