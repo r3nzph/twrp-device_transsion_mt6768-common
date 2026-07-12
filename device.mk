@@ -93,17 +93,20 @@ PRODUCT_PACKAGES += \
     android.hardware.gatekeeper@1.0
 
 # Health Storage HIDL (required by vold)
+# NOTE: android.hardware.health.storage-V1-ndk, android.security.maintenance-ndk,
+# android.system.keystore2-V2-ndk, and security keymint NDK backends are commented
+# out because they may not exist in minimal-manifest-twrp 12.1 (added in 12L/13).
 PRODUCT_PACKAGES += \
-    android.hardware.health.storage@1.0 \
-    android.hardware.health.storage-V1-ndk \
-    android.security.maintenance-ndk \
-    android.system.keystore2-V2-ndk
+    android.hardware.health.storage@1.0
 
-# Security Keymint HIDL (required by libkeymint)
-PRODUCT_PACKAGES += \
-    android.hardware.security.keymint-V2-ndk \
-    android.hardware.security.secureclock-V1-ndk \
-    android.hardware.security.sharedsecret-V1-ndk
+# Security Keymint HIDL interfaces (HIDL, not NDK — compatible with AOSP 12.1)
+# The NDK backends (-V2-ndk) were added in Android 12L/13 and may not be
+# available in minimal-manifest-twrp 12.1. Keymaster 4.1 HIDL handles
+# the actual key operations.
+# PRODUCT_PACKAGES += \
+#    android.hardware.security.keymint-V2-ndk \
+#    android.hardware.security.secureclock-V1-ndk \
+#    android.hardware.security.sharedsecret-V1-ndk
 
 # Keymaster HIDL
 PRODUCT_PACKAGES += \

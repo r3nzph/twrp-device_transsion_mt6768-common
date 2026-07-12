@@ -124,6 +124,11 @@ TARGET_COPY_OUT_VENDOR := vendor
 TARGET_BOARD_PLATFORM := mt6768
 BOARD_VNDK_VERSION := current
 
+# System SDK version must match PRODUCT_SHIPPING_API_LEVEL (33)
+# to avoid build error: "BOARD_SYSTEMSDK_VERSIONS (32) must all be greater
+# than or equal to PRODUCT_SHIPPING_API_LEVEL (33)"
+BOARD_SYSTEMSDK_VERSIONS := 33
+
 # Recovery Settings
 TARGET_NO_RECOVERY := true
 BOARD_INCLUDE_RECOVERY_RAMDISK_IN_VENDOR_BOOT := true
@@ -170,8 +175,7 @@ TW_CRYPTO_USE_SYSTEM_VOLD := true
 TW_CRYPTO_SYSTEM_VOLD_DECRYPT := true
 TW_CRYPTO_SYSTEM_VOLD_KEY_PATH := "/metadata/vold/metadata_encryption"
 
-# Modules - vendor_boot modules loaded for display/touch
-# TW_LOAD_VENDOR_BOOT_MODULES := true (already set in Display Settings section)
+# Vendor boot modules loaded for display/touch
 TW_LOAD_VENDOR_MODULES := "mediatek-drm.ko mtk_panel_ext.ko pwm-mtk-disp.ko leds-mtk-disp.ko tran_drm_panel_i2c.ko"
 
 # Mount behavior
