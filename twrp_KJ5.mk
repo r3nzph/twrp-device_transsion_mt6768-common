@@ -9,7 +9,7 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/gsi_keys.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota.mk)
 
 # Android 13 API level
-PRODUCT_SHIPPING_API_LEVEL := 33
+# PRODUCT_SHIPPING_API_LEVEL := 33
 
 # Inherit some common twrp stuff.
 $(call inherit-product, vendor/twrp/config/common.mk)
