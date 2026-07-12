@@ -1,0 +1,12 @@
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.pyc
+__pycache__/
+*.iml
+.idea/
+.vscode/
+*.bak
+*.orig

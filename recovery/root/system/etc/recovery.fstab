@@ -1,6 +1,7 @@
-
 #########################################################
 # SYSTEM PARTITIONS (READ ONLY)
+# erofs primary, ext4 fallback
+# Added avb_keys for GSI compatibility
 #########################################################
 
 system      /system      erofs  ro wait,slotselect,avb=vbmeta_system,logical,first_stage_mount,avb_keys=/avb/q-gsi.avbpubkey:/avb/r-gsi.avbpubkey:/avb/s-gsi.avbpubkey
@@ -13,24 +14,29 @@ product     /product     erofs  ro wait,slotselect,avb,logical,first_stage_mount
 
 #########################################################
 # CRITICAL MOUNT PARTITIONS (DO NOT MODIFY ORDER)
+# /metadata MUST mount before /data for FBE / metadata encryption
 #########################################################
 
-/dev/block/by-name/md_udc   /metadata  ext4  noatime,nosuid,nodev,discard,first_stage_mount,wait,check,formattable
+/dev/block/by-name/md_udc   /metadata  ext4  noatime,nosuid,nodev,discard  wait,check,formattable,first_stage_mount
 
-/dev/block/by-name/userdata  /data  f2fs  noatime,nosuid,nodev,discard,noflush_merge,fsync_mode=nobarrier,reserve_root=134217,resgid=1065,inlinecrypt  wait,check,formattable,quota,latemount,resize,readahead_size_kb=512,reservedsize=128m,checkpoint=fs,fileencryption=aes-256-xts:aes-256-cts:v2,keydirectory=/metadata/vold/metadata_encryption
+# NOTE: The keydirectory=/metadata/vold/metadata_encryption path is critical for FBE
+# with metadata encryption. TWRP creates this directory in init.recovery.mt6768.rc
+# during the `on fs` phase before this mount happens.
+/dev/block/by-name/userdata  /data  f2fs  noatime,nosuid,nodev,discard,noflush_merge,fsync_mode=nobarrier,reserve_root=134217,resgid=1065,inlinecrypt  latemount,wait,check,formattable,quota,resize,readahead_size_kb=512,reservedsize=128m,checkpoint=fs,fileencryption=aes-256-xts:aes-256-cts:v2,keydirectory=/metadata/vold/metadata_encryption
+
 
 #########################################################
 # VENDOR / OEM STORAGE PARTITIONS
 #########################################################
 
-/dev/block/by-name/tranfs   /tranfs     ext4  noatime,nosuid,nodev,noauto_da_alloc,discard,wait,check,formattable,nofail,first_stage_mount
+/dev/block/by-name/tranfs   /tranfs     ext4  noatime,nosuid,nodev,noauto_da_alloc,discard  wait,check,formattable,nofail,first_stage_mount
 
-/dev/block/by-name/protect1 /mnt/vendor/protect_f ext4 noatime,nosuid,nodev,noauto_da_alloc,commit=1,nodelalloc,wait,check,formattable
-/dev/block/by-name/protect2 /mnt/vendor/protect_s ext4 noatime,nosuid,nodev,noauto_da_alloc,commit=1,nodelalloc,wait,check,formattable
+/dev/block/by-name/protect1 /mnt/vendor/protect_f ext4 noatime,nosuid,nodev,noauto_da_alloc,commit=1,nodelalloc  wait,check,formattable
+/dev/block/by-name/protect2 /mnt/vendor/protect_s ext4 noatime,nosuid,nodev,noauto_da_alloc,commit=1,nodelalloc  wait,check,formattable
 
-/dev/block/by-name/nvdata   /mnt/vendor/nvdata ext4 noatime,nosuid,nodev,noauto_da_alloc,commit=1,nodelalloc,wait,check,formattable
-/dev/block/by-name/nvcfg    /mnt/vendor/nvcfg  ext4 noatime,nosuid,nodev,noauto_da_alloc,commit=1,nodelalloc,wait,check,formattable
-/dev/block/by-name/persist  /mnt/vendor/persist ext4 noatime,nosuid,nodev,noauto_da_alloc,commit=1,nodelalloc,wait,check,formattable
+/dev/block/by-name/nvdata   /mnt/vendor/nvdata ext4 noatime,nosuid,nodev,noauto_da_alloc,commit=1,nodelalloc  wait,check,formattable
+/dev/block/by-name/nvcfg    /mnt/vendor/nvcfg  ext4 noatime,nosuid,nodev,noauto_da_alloc,commit=1,nodelalloc  wait,check,formattable
+/dev/block/by-name/persist  /mnt/vendor/persist ext4 noatime,nosuid,nodev,noauto_da_alloc,commit=1,nodelalloc  wait,check,formattable
 
 
 #########################################################
@@ -42,6 +48,8 @@ product     /product     erofs  ro wait,slotselect,avb,logical,first_stage_mount
 /dev/block/by-name/dtbo         /dtbo         emmc defaults
 /dev/block/by-name/logo         /logo         emmc defaults
 /dev/block/by-name/expdb        /expdb        emmc defaults
+/dev/block/by-name/tkv          /tkv          emmc defaults
+/dev/block/by-name/seccfg       /seccfg       emmc defaults
 
 
 #########################################################
@@ -86,17 +94,34 @@ product     /product     erofs  ro wait,slotselect,avb,logical,first_stage_mount
 
 /dev/block/by-name/vbmeta          /vbmeta emmc defaults
 /dev/block/by-name/vbmeta_vendor   /vbmeta_vendor emmc defaults
-/dev/block/by-name/vbmeta_system   /vbmeta_system emmc defaults
+/dev/block/by-name/vbmeta_system   /vbmeta_system emmc defaults first_stage_mount,nofail,slotselect,avb=vbmeta
 
 
 #########################################################
-# TR TRANSSION CUSTOM PARTITIONS
+# BOOTLOADER PARTITIONS (from stock fstab)
 #########################################################
 
+/dev/block/by-name/lk   /bootloader emmc defaults
+/dev/block/by-name/lk2  /bootloader2 emmc defaults
+
+
+#########################################################
+# TRANSSION CUSTOM DYNAMIC PARTITIONS (erofs + ext4 fallback)
+# These are logical partitions inside super; slotselect is required for A/B
+# Both erofs and ext4 entries needed: vold/twrp tries each as fallback
+#########################################################
+
+tr_mi      /tr_mi      ext4  ro wait,slotselect,logical,first_stage_mount,avb_keys=/vendor/etc/tran_avb.pubkey,nofail
 tr_mi      /tr_mi      erofs ro wait,slotselect,logical,first_stage_mount,avb_keys=/vendor/etc/tran_avb.pubkey,nofail
+tr_theme   /tr_theme   ext4  ro wait,slotselect,logical,first_stage_mount,avb_keys=/vendor/etc/tran_avb.pubkey,nofail
 tr_theme   /tr_theme   erofs ro wait,slotselect,logical,first_stage_mount,avb_keys=/vendor/etc/tran_avb.pubkey,nofail
+tr_region  /tr_region  ext4  ro wait,slotselect,logical,first_stage_mount,avb_keys=/vendor/etc/tran_avb.pubkey,nofail
 tr_region  /tr_region  erofs ro wait,slotselect,logical,first_stage_mount,avb_keys=/vendor/etc/tran_avb.pubkey,nofail
+tr_company /tr_company ext4  ro wait,slotselect,logical,first_stage_mount,avb_keys=/vendor/etc/tran_avb.pubkey,nofail
 tr_company /tr_company erofs ro wait,slotselect,logical,first_stage_mount,avb_keys=/vendor/etc/tran_avb.pubkey,nofail
+tr_carrier /tr_carrier ext4  ro wait,slotselect,logical,first_stage_mount,avb_keys=/vendor/etc/tran_avb.pubkey,nofail
 tr_carrier /tr_carrier erofs ro wait,slotselect,logical,first_stage_mount,avb_keys=/vendor/etc/tran_avb.pubkey,nofail
+tr_product /tr_product ext4  ro wait,slotselect,logical,first_stage_mount,avb_keys=/vendor/etc/tran_avb.pubkey,nofail
 tr_product /tr_product erofs ro wait,slotselect,logical,first_stage_mount,avb_keys=/vendor/etc/tran_avb.pubkey,nofail
+tr_preload /tr_preload ext4  ro wait,slotselect,logical,first_stage_mount,avb_keys=/vendor/etc/tran_avb.pubkey,nofail
 tr_preload /tr_preload erofs ro wait,slotselect,logical,first_stage_mount,avb_keys=/vendor/etc/tran_avb.pubkey,nofail
