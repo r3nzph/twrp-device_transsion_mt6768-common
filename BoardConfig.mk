@@ -255,5 +255,9 @@ TW_DEVICE_VERSION := Spark 20 (KJ5)
 
 # === VENDOR BOOT CONFIGURATION ===
 # With boot header v4, recovery ramdisk is placed inside vendor_boot
+# This variable is REQUIRED by the build system (build/make/core/) to pass
+# --partition_size to avbtool add_hash_footer when generating vendor_boot.img
+# For MT6768 (Helio G88), the stock scatter file defines vendor_boot at 0x4000000
+BOARD_VENDOR_BOOTIMAGE_PARTITION_SIZE := 67108864
 BOARD_VENDOR_BOOTIMAGE_PARTITION_RESERVED_SIZE := 0
 BOARD_USES_VENDOR_BOOTIMAGE := true
