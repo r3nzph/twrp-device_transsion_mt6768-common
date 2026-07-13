@@ -267,6 +267,7 @@ cc_prebuilt_binary {
     recovery_available: true,
 }
 
+
 cc_prebuilt_library_shared {
     name: "vendor.mediatek.hardware.keymaster_attestation@1.1-impl",
     srcs: ["recovery/root/vendor/lib64/hw/vendor.mediatek.hardware.keymaster_attestation@1.1-impl.so"],

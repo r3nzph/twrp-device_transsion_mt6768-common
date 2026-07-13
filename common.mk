@@ -149,6 +149,7 @@ PRODUCT_PACKAGES += \
 # No build system registration needed for overlay files.
 # ============================================================
 
+
 # Additional configs
 TW_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES += \
     $(TARGET_OUT_SHARED_LIBRARIES)/libgatekeeper.so \
