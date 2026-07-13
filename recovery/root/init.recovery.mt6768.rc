@@ -1,5 +1,17 @@
 import /init.custom.rc
 
+# init.recovery.mt6768.rc — MT6768 Common Tree
+# Device-specific init for MT6768-based Transsion devices
+#
+# This file contains the MTK platform init, USB configuration,
+# TEE stack startup, and HAL service definitions shared across
+# all MT6768 Transsion devices.
+#
+# Imported by: init.recovery.rc
+#
+# NOTE: Actual device-specific init (if any) should go in
+# init.<device>.rc and be imported here or from init.recovery.rc.
+
 on init
     export LD_LIBRARY_PATH /system/lib64:/vendor/lib64:/vendor/lib64/hw:/system/lib64/hw
 

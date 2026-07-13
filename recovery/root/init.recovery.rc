@@ -1,8 +1,8 @@
 # init.recovery.rc - TWRP Recovery Initialization
-# TECNO Spark 20 (KJ5 / MT6768) - Android 13
+# MT6768 Common Tree - Android 13
 #
 # This file provides the generic TWRP init services that are needed
-# for HAL-based decryption. The device-specific init is in
+# for HAL-based decryption. Device-specific init is in
 # init.recovery.mt6768.rc
 #
 # Key services defined here:

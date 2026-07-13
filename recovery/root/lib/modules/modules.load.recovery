@@ -121,10 +121,6 @@ mtk_sync.ko
 mtk-mml-legacy.ko
 mtk_panel_ext.ko
 tran_drm_panel_i2c.ko
-icnl9916c_hdp_dsi_vdo_tm_tm_kj5.ko
-td4160_hdp_dsi_vdo_hx_hx_kj5.ko
-icnl9916c_hdp_dsi_vdo_boe_boe_kj5.ko
-td4160_hdp_dsi_vdo_lce_hkc_kj5.ko
 mtk_disp_notify.ko
 mediatek-drm.ko
 aee_rs.ko

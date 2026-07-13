@@ -1,5 +1,5 @@
 # ueventd.mt6768.rc
-# Device node permissions for TECNO Spark 20 (KJ5 / MT6768)
+# Device node permissions for MT6768-based Transsion devices
 # Required for: display, touch, TEE, storage, USB, GPIO access
 
 # ============================================================

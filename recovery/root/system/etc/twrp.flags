@@ -1,5 +1,5 @@
 #########################################################
-# TWRP FLAGS - TECNO Spark 20 (KJ5 / MT6768)
+# TWRP FLAGS - MT6768 Common Tree
 # Android 13 - Dynamic Partitions - A/B - FBE v2
 #
 # Format: <mount_point> <fstype> <device> [<device2>] [flags]

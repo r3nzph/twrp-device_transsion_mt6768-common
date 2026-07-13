@@ -1,5 +1,5 @@
 // ============================================================
-// Android.bp — TECNO Spark 20 (KJ5 / MT6768)
+// Android.bp — MT6768 Common Tree
 //
 // Prebuilt module definitions for VENDOR-SPECIFIC proprietary
 // blobs ONLY. These modules do NOT exist in AOSP source.

@@ -1,12 +1,13 @@
 #
 # Copyright (C) 2025 The Android Open Source Project
-# Copyright (C) 2025 SebaUbuntu's TWRP device tree generator
 #
 # SPDX-License-Identifier: Apache-2.0
+#
+# Common tree makefile for Transsion MT6768 devices
+# Included automatically for any device using this common tree.
 #
 
 LOCAL_PATH := $(call my-dir)
 
-ifeq ($(TARGET_DEVICE),KJ5)
-include $(call all-subdir-makefiles,$(LOCAL_PATH))
-endif
+# The bootctrl prebuilt modules
+include $(LOCAL_PATH)/bootctrl/Android.mk
