@@ -1,0 +1,284 @@
+# init.tee.rc - Trustonic TEE / Mobicore / Keymaster / Gatekeeper
+# TECNO Spark 20 (KJ5 / MT6768) - Android 13
+#
+# GENERATED EXCLUSIVELY FROM TECNO KJ5 FIRMWARE DUMP
+# Source: dumps.tadiphone.dev/dumps/tecno/tecno-kj5.git
+#
+# ALL PATHS VERIFIED against recovery/root/vendor/:
+#    6 service binaries       ✓ all exist
+#   14 .drbin files           ✓ all exist in vendor/app/mcRegistry/
+#   15 .drbin files removed   ✗ referenced in stock trustonic.rc but not present in dump
+#
+# Consolidated from:
+#   vendor/etc/init/tee.rc                          - Directory setup
+#   vendor/etc/init/trustonic.rc                    - mobicore (mcDriverDaemon) + .drbin registrations
+#   vendor/etc/init/trustonic.mc_kmsetkey_ca.rc     - trustonic_check_keybox_service
+#   vendor/etc/init/vendor.trustonic.tee@1.1-service.rc  - tee-1-1 HAL service
+#   vendor/etc/init/android.hardware.keymaster@4.1-service.trustonic.rc  - keymaster 4.1
+#   vendor/etc/init/vendor.mediatek.hardware.keymaster_attestation@1.1-service.rc  - attestation
+#   vendor/etc/init/android.hardware.gatekeeper@1.0-service.rc  - gatekeeper
+#
+# This device uses Trustonic Kinibi TEE (not Microtrust/TEEI, not beanpod).
+# mcDriverDaemon is the TEE daemon (service name "mobicore").
+#
+# NOTE: This file must be imported from init.recovery.mt6768.rc
+# Add:  import /init.tee.rc
+# Then remove duplicate TEE service definitions from init.recovery.mt6768.rc.
+
+
+# ============================================================
+# TEE DIRECTORIES & PERMISSIONS
+# ============================================================
+# Source: vendor/etc/init/tee.rc (KJ5 firmware dump, verbatim)
+
+on init
+    # Create mountpoint for /mnt/vendor/persist partition
+    # (matches stock vendor/etc/init/tee.rc trigger)
+    mkdir /mnt/vendor/persist 0771 system system
+
+on post-fs
+    chown system system /mnt/vendor/persist
+    chmod 0771 /mnt/vendor/persist
+
+    # Apply SELinux label to persist mount point
+    restorecon /mnt/vendor/persist
+
+    # mcRegistry directory - stores TEE failure records and trusted app registry
+    mkdir /mnt/vendor/persist/mcRegistry 0771 system system
+
+    # paytrigger - used by pay/DRM trigger mechanisms
+    mkdir /mnt/vendor/persist/paytrigger
+    chown system system /mnt/vendor/persist/paytrigger
+    chmod 0777 /mnt/vendor/persist/paytrigger
+
+    # startPara - anti-crack parameter storage per BSP xiaolin.wu 20231225
+    mkdir /mnt/vendor/persist/startPara
+    chown system system /mnt/vendor/persist/startPara
+    chmod 0777 /mnt/vendor/persist/startPara
+    mkdir /tranfs/startPara
+    chown system system /tranfs/startPara
+    chmod 0777 /tranfs/startPara
+
+on post-fs-data
+    # Key provisioning directory - stores provisioned key blobs
+    mkdir /data/vendor/key_provisioning 0771 system system
+
+
+# ============================================================
+# CRYPTO STATE TRIGGERS - /data/vendor/mcRegistry Creation
+# ============================================================
+# Source: vendor/etc/init/tee.rc (KJ5 firmware dump, verbatim)
+
+# META/FACTORY mode - unencrypted device
+on property:ro.crypto.state=unencrypted
+    write /proc/bootprof "MOBICORE: create /data/vendor/mcRegistry ++ (unencrypted)"
+    mkdir /data/vendor/mcRegistry 0775 system system
+    write /proc/bootprof "MOBICORE: create /data/vendor/mcRegistry -- (unencrypted)"
+
+# Normal mode with FBE
+on property:ro.crypto.type=file && property:ro.crypto.state=encrypted
+    write /proc/bootprof "MOBICORE: create /data/vendor/mcRegistry ++ (FBE encrypted)"
+    mkdir /data/vendor/mcRegistry 0775 system system
+    write /proc/bootprof "MOBICORE: create /data/vendor/mcRegistry -- (FBE encrypted)"
+
+# Normal mode with FDE
+on property:vold.decrypt=trigger_restart_framework
+    write /proc/bootprof "MOBICORE: create /data/vendor/mcRegistry ++ (FDE encrypted)"
+    mkdir /data/vendor/mcRegistry 0775 system system
+    write /proc/bootprof "MOBICORE: create /data/vendor/mcRegistry -- (FDE encrypted)"
+
+
+# ============================================================
+# MOBICORE SERVICE (mcDriverDaemon)
+# ============================================================
+# Source: vendor/etc/init/trustonic.rc (KJ5 firmware dump, verbatim)
+# Daemon: /vendor/bin/mcDriverDaemon
+#   PATH VERIFIED: recovery/root/vendor/bin/mcDriverDaemon (732504 bytes)
+#
+# This is the Trustonic TEE driver daemon. Despite the service name
+# "mobicore", the actual binary is mcDriverDaemon (Kinibi TEE).
+#
+# Only .drbin files that exist in recovery/root/vendor/app/mcRegistry/
+# are included below. The stock trustonic.rc references 29 .drbin files,
+# but 15 of those have no corresponding file in the firmware dump's
+# mcRegistry directory and have been excluded here. mcDriverDaemon
+# tolerates missing -r entries gracefully (logs warning, continues).
+#
+# See t-Drv naming comments at end of file.
+
+service mobicore /vendor/bin/mcDriverDaemon \
+    --sfs-reformat --P1 /mnt/vendor/persist/mcRegistry \
+    -r /vendor/app/mcRegistry/06090000000000000000000000000000.drbin \
+    -r /vendor/app/mcRegistry/020f0000000000000000000000000000.drbin \
+    -r /vendor/app/mcRegistry/05120000000000000000000000000000.drbin \
+    -r /vendor/app/mcRegistry/05120000000000000000000000000001.drbin \
+    -r /vendor/app/mcRegistry/020b0000000000000000000000000000.drbin \
+    -r /vendor/app/mcRegistry/05070000000000000000000000000000.drbin \
+    -r /vendor/app/mcRegistry/030b0000000000000000000000000000.drbin \
+    -r /vendor/app/mcRegistry/030c0000000000000000000000000000.drbin \
+    -r /vendor/app/mcRegistry/40188311faf343488db888ad39496f9a.drbin \
+    -r /vendor/app/mcRegistry/07060000000000000000000000007169.drbin \
+    -r /vendor/app/mcRegistry/08070000000000000000000000008270.drbin \
+    -r /vendor/app/mcRegistry/07070000000000000000000000000000.drbin \
+    -r /vendor/app/mcRegistry/9073f03a9618383bb1856eb3f990babd.drbin \
+    -r /vendor/app/mcRegistry/5020170115e016302017012521300000.drbin
+    class core
+    user system
+    group system
+    priority -20
+    disabled
+    seclabel u:r:recovery:s0
+
+# t-Drv naming reference (from KJ5 firmware dump trustonic.rc):
+# Files PRESENT in recovery/root/vendor/app/mcRegistry/:
+# 020f0000000000000000000000000000.drbin : utils
+# 05120000000000000000000000000000.drbin : sec
+# 020b0000000000000000000000000000.drbin : cmdq
+# 05070000000000000000000000000000.drbin : goodix_fp
+# 030b0000000000000000000000000000.drbin : spi
+# 030c0000000000000000000000000000.drbin : spi5
+# 07070000000000000000000000000000.drbin : MtkH264Venc
+# 07060000000000000000000000007169.drbin : MtkH264Vdec
+# 08070000000000000000000000008270.drbin : MtkVP9Vdec
+# 5020170115e016302017012521300000.drbin : drm_hdcp_common
+# 40188311faf343488db888ad39496f9a.drbin : widevine
+# 06090000000000000000000000000000.drbin : drm keyinstall
+# 9073f03a9618383bb1856eb3f990babd.drbin : m4u
+#
+# Files REFERENCED in stock trustonic.rc but NOT present in dump:
+# 05160000000000000000000000000000.drbin (unnamed)
+# 03100000000000000000000000000000.drbin (unnamed)
+# 031c0000000000000000000000000000.drbin (unnamed)
+# 032c0000000000000000000000000000.drbin (unnamed)
+# 033c0000000000000000000000000000.drbin (unnamed)
+# 034c0000000000000000000000000000.drbin (unnamed)
+# 035c0000000000000000000000000000.drbin (unnamed)
+# 036c0000000000000000000000000000.drbin (unnamed)
+# 037c0000000000000000000000000000.drbin (unnamed)
+# 090b0000000000000000000000000000.drbin : IRIS_I2C
+# 0f5eed3c3b5a47afacca69a84bf0efad.drbin : isp
+# 4be4f7dc1f2c11e5b5f7727283247c7f.drbin : MtkH265Vdec
+# 07407000000000000000000000000000.drbin : sensor
+# 07090000000000000000000000000000.drbin (unnamed)
+# 6b3f5fa0f8cf55a7be2582587d62d63a.drbin : hdcp
+
+
+# ============================================================
+# TRUSTONIC TEE 1.1 HAL SERVICE
+# ============================================================
+# Source: vendor/etc/init/vendor.trustonic.tee@1.1-service.rc (KJ5 firmware dump)
+# Binary: /vendor/bin/hw/vendor.trustonic.tee@1.1-service
+#   PATH VERIFIED: recovery/root/vendor/bin/hw/vendor.trustonic.tee@1.1-service (73552 bytes)
+
+service tee-1-1 /vendor/bin/hw/vendor.trustonic.tee@1.1-service
+    class hal
+    user system
+    group system
+    disabled
+    seclabel u:r:recovery:s0
+
+
+# ============================================================
+# KEYMASTER 4.1 - TRUSTONIC BACKEND
+# ============================================================
+# Source: vendor/etc/init/android.hardware.keymaster@4.1-service.trustonic.rc (KJ5 firmware dump)
+# Binary: /vendor/bin/hw/android.hardware.keymaster@4.1-service.trustonic
+#   PATH VERIFIED: recovery/root/vendor/bin/hw/android.hardware.keymaster@4.1-service.trustonic (97824 bytes)
+
+service vendor.keymaster-4-1-trustonic /vendor/bin/hw/android.hardware.keymaster@4.1-service.trustonic
+    class early_hal
+    user system
+    group system drmrpc
+    disabled
+    seclabel u:r:recovery:s0
+
+
+# ============================================================
+# KEYMASTER ATTESTATION 1.1 - MEDIATEK
+# ============================================================
+# Source: vendor/etc/init/vendor.mediatek.hardware.keymaster_attestation@1.1-service.rc (KJ5 firmware dump)
+# Binary: /vendor/bin/hw/vendor.mediatek.hardware.keymaster_attestation@1.1-service
+#   PATH VERIFIED: recovery/root/vendor/bin/hw/vendor.mediatek.hardware.keymaster_attestation@1.1-service (11128 bytes)
+
+service keymaster_attestation-1-1 /vendor/bin/hw/vendor.mediatek.hardware.keymaster_attestation@1.1-service
+    interface vendor.mediatek.hardware.keymaster_attestation@1.0::IKeymasterDevice default
+    interface vendor.mediatek.hardware.keymaster_attestation@1.1::IKeymasterDevice default
+    class hal
+    user system
+    group system
+    disabled
+    seclabel u:r:recovery:s0
+
+
+# ============================================================
+# GATEKEEPER 1.0 HAL SERVICE
+# ============================================================
+# Source: vendor/etc/init/android.hardware.gatekeeper@1.0-service.rc (KJ5 firmware dump)
+# Binary: /vendor/bin/hw/android.hardware.gatekeeper@1.0-service
+#   PATH VERIFIED: recovery/root/vendor/bin/hw/android.hardware.gatekeeper@1.0-service (11160 bytes)
+
+service vendor.gatekeeper-1-0 /vendor/bin/hw/android.hardware.gatekeeper@1.0-service
+    interface android.hardware.gatekeeper@1.0::IGatekeeper default
+    class hal
+    user system
+    group system
+    disabled
+    seclabel u:r:recovery:s0
+
+
+# ============================================================
+# TRUSTONIC KEYBOX CHECK SERVICE
+# ============================================================
+# Source: vendor/etc/init/trustonic.mc_kmsetkey_ca.rc (KJ5 firmware dump)
+# Binary: /vendor/bin/kmsetkey_ca.trustonic -c
+#   PATH VERIFIED: recovery/root/vendor/bin/kmsetkey_ca.trustonic (19440 bytes)
+
+service trustonic_check_keybox_service /vendor/bin/kmsetkey_ca.trustonic -c
+    class late_start
+    user system
+    group system
+    oneshot
+    disabled
+    seclabel u:r:recovery:s0
+
+
+# ============================================================
+# TEE STARTUP SEQUENCE
+# ============================================================
+# Correct startup order:
+#   1. mobicore (mcDriverDaemon) - initializes TEE hardware
+#   2. tee-1-1 - registers TEE HAL interface
+#   3. vendor.keymaster-4-1-trustonic - registers keymaster HAL
+#   4. vendor.gatekeeper-1-0 - registers gatekeeper HAL
+#
+# Triggered when hwservicemanager.ready=true (set by hwservicemanager).
+
+on property:hwservicemanager.ready=true
+    # Start TEE stack in dependency order
+    start mobicore
+    start tee-1-1
+    start vendor.keymaster-4-1-trustonic
+    start vendor.gatekeeper-1-0
+    # Keybox check (kmsetkey_ca.trustonic) - not critical for FBE
+    # In stock ROM this is class late_start, started unconditionally
+    start trustonic_check_keybox_service
+
+
+# ============================================================
+# CLEANUP TRIGGERS
+# ============================================================
+
+on property:ro.crypto.state=unsupported
+    stop mobicore
+    stop tee-1-1
+    stop vendor.keymaster-4-1-trustonic
+    stop vendor.gatekeeper-1-0
+    stop trustonic_check_keybox_service
+
+on property:twrp.decrypt.done=true && property:twrp.all.users.decrypted=true
+    write /proc/bootprof "TWRP: decryption done, stopping TEE services"
+    stop mobicore
+    stop tee-1-1
+    stop vendor.keymaster-4-1-trustonic
+    stop vendor.gatekeeper-1-0
+    stop trustonic_check_keybox_service

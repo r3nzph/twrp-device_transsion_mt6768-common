@@ -1,0 +1,291 @@
+import /init.custom.rc
+
+on init
+    export LD_LIBRARY_PATH /system/lib64:/vendor/lib64:/vendor/lib64/hw:/system/lib64/hw
+
+    # ===== STOCK MTK USB INIT =====
+    setprop sys.usb.configfs 1
+    setprop sys.usb.controller musb-hdrc
+    setprop sys.usb.ffs.aio_compat 0
+
+    # ===== TEE / SECURE WORLD =====
+    # Set TEE properties early so services can detect support
+    setprop ro.vendor.mtk_tee_gp_support 1
+    setprop ro.vendor.mtk_trustonic_tee_support 1
+    setprop ro.hardware.gatekeeper trustonic
+    setprop keymaster_ver 4.1
+
+
+on fs
+    mkdir /mnt/vendor/persist 0771 system system
+    mkdir /mnt/vendor/persist/mcRegistry 0771 system system
+    mkdir /mnt/vendor/persist/paytrigger
+    mkdir /data/vendor/key_provisioning 0771 system system
+    restorecon /mnt/vendor/persist
+
+    install_keyring
+
+    # Ensure key directory for metadata encryption exists on /metadata
+    # (TWRP will mount /metadata early via recovery.fstab)
+    mkdir /metadata/vold 0775 root root
+    mkdir /metadata/vold/metadata_encryption 0775 root root
+
+    # OTG and charging related sysfs writes
+    write /sys/class/power_supply/usb/otg_switch 1
+    write /sys/class/oplus_chg/usb/otg_switch 1
+
+
+on post-fs
+    # Support A/B feature for EMMC and UFS boot region
+    symlink /dev/block/sda /dev/block/mmcblk0boot0
+    symlink /dev/block/sdb /dev/block/mmcblk0boot1
+    symlink /dev/block/mmcblk0boot0 /dev/block/platform/bootdevice/by-name/preloader_a
+    symlink /dev/block/mmcblk0boot1 /dev/block/platform/bootdevice/by-name/preloader_b
+    symlink /dev/block/mmcblk0boot0 /dev/block/by-name/preloader_a
+    symlink /dev/block/mmcblk0boot1 /dev/block/by-name/preloader_b
+
+    # Ensure USB configfs is set up
+    setprop sys.usb.configfs 1
+
+    start mtk.plpath.utils
+    start mtk.plpath.utils.link
+
+
+# ============================================================
+# MTK PLATFORM UTILS
+# ============================================================
+
+service mtk.plpath.utils /system/bin/mtk_plpath_utils
+    class main
+    user root
+    group root system
+    disabled
+    oneshot
+    seclabel u:r:recovery:s0
+
+service mtk.plpath.utils.link /system/bin/mtk_plpath_utils
+    class main
+    user root
+    group root system
+    disabled
+    oneshot
+    seclabel u:r:recovery:s0
+
+
+on property:persist.vendor.mtk.pl_lnk=1
+    symlink /dev/block/mapper/pl_a /dev/block/by-name/preloader_raw_a
+    symlink /dev/block/mapper/pl_b /dev/block/by-name/preloader_raw_b
+    symlink /dev/block/mapper/pl_a /dev/block/platform/bootdevice/by-name/preloader_raw_a
+    symlink /dev/block/mapper/pl_b /dev/block/platform/bootdevice/by-name/preloader_raw_b
+
+
+# ============================================================
+# KEYSTORE SERVICES (needed for FBE decryption)
+# ============================================================
+
+service keystore_auth /system/bin/keystore_auth
+    class main
+    user system
+    group root
+    disabled
+    oneshot
+    seclabel u:r:recovery:s0
+
+service keystore /system/bin/keystore /tmp/misc/keystore
+    class main
+    user root
+    group root drmrpc readproc log
+    disabled
+    oneshot
+    seclabel u:r:recovery:s0
+
+
+# ============================================================
+# MOBICORE / MCDRIVER (Trustonic TEE HW interface)
+# ============================================================
+# This must start BEFORE tee-1-1 and keymaster!
+# mobicore initializes the Trustonic TEE hardware interface.
+# NOTE: The mobicore binary must exist at /vendor/bin/mobicore.
+# Extract it from stock vendor.img if not present.
+
+# NOTE: On this firmware, the TEE daemon is mcDriverDaemon, not mobicore.
+# If your device has mobicore instead, change this path.
+service mobicore /vendor/bin/mcDriverDaemon
+    class core
+    user root
+    group root
+    disabled
+    oneshot
+    seclabel u:r:recovery:s0
+
+# ============================================================
+# TRUSTONIC TEE 1.1 SERVICE
+# ============================================================
+# Starts after mobicore initializes the TEE HW.
+
+service tee-1-1 /vendor/bin/hw/vendor.trustonic.tee@1.1-service
+    class hal
+    user root
+    group root
+    disabled
+    seclabel u:r:recovery:s0
+
+# ============================================================
+# KEYMASTER 4.1 (TRUSTONIC)
+# ============================================================
+# Requires: mobicore → tee-1-1 running first
+# Handles FBE key derivation
+
+service vendor.keymaster-4-1-trustonic /vendor/bin/hw/android.hardware.keymaster@4.1-service.trustonic
+    class early_hal
+    user root
+    group root drmrpc
+    disabled
+    seclabel u:r:recovery:s0
+
+# ============================================================
+# GATEKEEPER 1.0 (TRUSTONIC)
+# ============================================================
+# Requires: mobicore → tee-1-1 → keymaster running first
+# Handles PIN/password verification for FBE unlock
+
+service vendor.gatekeeper-1-0 /vendor/bin/hw/android.hardware.gatekeeper@1.0-service
+    interface android.hardware.gatekeeper@1.0::IGatekeeper default
+    class hal
+    user root
+    group root
+    disabled
+    seclabel u:r:recovery:s0
+
+
+# ============================================================
+# TEE STARTUP SEQUENCE
+# ============================================================
+# hwservicemanager.ready=true → start mobicore → start tee-1-1
+# → start keymaster → start gatekeeper
+#
+# The hwservicemanager.ready property is set after hwservicemanager
+# has registered itself (usually from init.recovery.rc).
+
+on property:hwservicemanager.ready=true
+    # Create mcRegistry directory (needed by mobicore)
+    write /proc/bootprof "MOBICORE: create /data/vendor/mcRegistry ++"
+    mkdir /data/vendor/mcRegistry 0775 system system
+    write /proc/bootprof "MOBICORE: create /data/vendor/mcRegistry --"
+
+    # Start TEE stack in correct order
+    start mobicore
+    start tee-1-1
+    start vendor.keymaster-4-1-trustonic
+    start vendor.gatekeeper-1-0
+
+
+# ============================================================
+# CLEANUP ON DECRYPT FAILURE / UNSUPPORTED CRYPTO
+# ============================================================
+
+on property:ro.crypto.state=unsupported
+    write /proc/bootprof "CRYPTO: unsupported, stopping TEE services"
+    stop mobicore
+    stop tee-1-1
+    stop vendor.keymaster-4-1-trustonic
+    stop vendor.gatekeeper-1-0
+    stop servicemanager
+    stop hwservicemanager
+
+on property:ro.crypto.type=file && property:ro.crypto.state=unencrypted
+    write /proc/bootprof "CRYPTO: file unencrypted, stopping TEE services"
+    stop mobicore
+    stop tee-1-1
+    stop vendor.keymaster-4-1-trustonic
+    stop vendor.gatekeeper-1-0
+    stop servicemanager
+    stop hwservicemanager
+
+
+# ============================================================
+# TEE CLEANUP AFTER DECRYPTION SUCCEEDS
+# ============================================================
+# Once TWRP has successfully decrypted, we can stop TEE services
+# to free resources for backup/flashing operations.
+
+on property:twrp.decrypt.done=true && property:twrp.all.users.decrypted=true
+    write /proc/bootprof "TWRP: decryption complete, stopping TEE services"
+    stop mobicore
+    stop tee-1-1
+    stop vendor.keymaster-4-1-trustonic
+    stop vendor.gatekeeper-1-0
+    stop servicemanager
+    stop hwservicemanager
+
+
+# ============================================================
+# POST-FS-DATA HOOKS
+# ============================================================
+
+on post-fs-data
+    mkdir /data/vendor_de 0770 system system
+    mkdir /data/vendor_de/0 0770 system system
+
+
+# ============================================================
+# BOOT STAGE
+# ============================================================
+
+on boot
+    # Start HW HAL services needed during recovery
+    start boot-hal-1-2
+    start health-hal-2-1
+
+    # USB controller mode (stock behavior for MTP+ADB)
+    setprop sys.usb.configfs 1
+    setprop sys.usb.controller musb-hdrc
+    setprop sys.usb.state mtp,adb
+
+    # Ensure OTG role is correctly set
+    write /sys/class/usb_role/mt_usb-role-switch/role device
+
+    # Load vendor boot modules for display/touch
+    # (TW_LOAD_VENDOR_BOOT_MODULES handles this)
+
+
+# ============================================================
+# BOOT CONTROL HAL 1.2 (MTK Prebuilt from firmware)
+# ============================================================
+# NOTE: The bootctrl/ source builds android.hardware.boot@1.0-impl-1.2-mtkimpl.so
+# which is a shared library (implementation), NOT a service binary.
+# The actual service binary is android.hardware.boot@1.2-service
+# (extracted from stock firmware at vendor/bin/hw/).
+
+service boot-hal-1-2 /vendor/bin/hw/android.hardware.boot@1.2-service
+    interface android.hardware.boot@1.0::IBootControl default
+    interface android.hardware.boot@1.1::IBootControl default
+    interface android.hardware.boot@1.2::IBootControl default
+    class hal
+    user root
+    group root
+    disabled
+    oneshot
+    seclabel u:r:recovery:s0
+
+
+# ============================================================
+# HEALTH HAL 2.1
+# ============================================================
+
+service health-hal-2-1 /vendor/bin/hw/android.hardware.health@2.1-service
+    interface android.hardware.health@2.1::IHealth default
+    class hal
+    user root
+    group root system
+    disabled
+    oneshot
+    seclabel u:r:recovery:s0
+
+
+# ============================================================
+# USB CONFIG STABILIZATION
+# ============================================================
+
+on property:sys.usb.config=mtp,adb
+    setprop sys.usb.state mtp,adb
