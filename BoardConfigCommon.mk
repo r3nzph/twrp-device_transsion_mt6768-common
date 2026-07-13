@@ -14,7 +14,7 @@
 # ============================================================
 
 # ============================================================
-# ARCHITECTURE
+# ARCHITECTURE — ARM64
 # ============================================================
 TARGET_ARCH := arm64
 TARGET_ARCH_VARIANT := armv8-a
@@ -33,12 +33,16 @@ TARGET_IS_64_BIT := true
 TARGET_USES_64_BIT_BINDER := true
 
 # ============================================================
-# PLATFORM
+# PLATFORM — MediaTek MT6768
 # ============================================================
 TARGET_BOARD_PLATFORM := mt6768
+BOARD_VNDK_VERSION := current
 BOARD_USES_MTK_HARDWARE := true
 ENABLE_CPUSETS := true
 ENABLE_SCHEDBOOST := true
+BUILD_BROKEN_DUP_RULES := true
+BUILD_BROKEN_ELF_PREBUILT_PRODUCT_COPY_FILES := true
+ALLOW_MISSING_DEPENDENCIES := true
 
 # ============================================================
 # BOOTLOADER
@@ -47,14 +51,7 @@ TARGET_NO_BOOTLOADER := true
 TARGET_USES_UEFI := true
 
 # ============================================================
-# BUILD FIXES
-# ============================================================
-BUILD_BROKEN_DUP_RULES := true
-BUILD_BROKEN_ELF_PREBUILT_PRODUCT_COPY_FILES := true
-ALLOW_MISSING_DEPENDENCIES := true
-
-# ============================================================
-# KERNEL — GKI-ONLY
+# KERNEL / GKI
 # ============================================================
 TARGET_NO_KERNEL := true
 BOARD_RAMDISK_USE_LZ4 := true
@@ -62,14 +59,13 @@ BOARD_RAMDISK_USE_LZ4 := true
 BOARD_BOOT_HEADER_VERSION := 4
 BOARD_KERNEL_BASE := 0x40078000
 BOARD_KERNEL_OFFSET := 0x00008000
-BOARD_KERNEL_TAGS_OFFSET := 0x0bc08000
 BOARD_PAGE_SIZE := 4096
 BOARD_TAGS_OFFSET := 0x0bc08000
 BOARD_RAMDISK_OFFSET := 0x07c08000
-BOARD_DTB_OFFSET := 0x0bc08000
 BOARD_HEADER_SIZE := 2128
 BOARD_VENDOR_CMDLINE := bootopt=64S3,32N2,64N2
 BOARD_VENDOR_BASE := 0x40078000
+BOARD_KERNEL_SEPARATED_DTBO := true
 
 BOARD_MKBOOTIMG_ARGS += --vendor_cmdline $(BOARD_VENDOR_CMDLINE)
 BOARD_MKBOOTIMG_ARGS += --pagesize $(BOARD_PAGE_SIZE) --board ""
@@ -77,49 +73,19 @@ BOARD_MKBOOTIMG_ARGS += --kernel_offset $(BOARD_KERNEL_OFFSET)
 BOARD_MKBOOTIMG_ARGS += --ramdisk_offset $(BOARD_RAMDISK_OFFSET)
 BOARD_MKBOOTIMG_ARGS += --tags_offset $(BOARD_TAGS_OFFSET)
 BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOT_HEADER_VERSION)
-BOARD_MKBOOTIMG_ARGS += --dtb_offset $(BOARD_DTB_OFFSET)
-
-BOARD_KERNEL_SEPARATED_DTBO := true
 
 # ============================================================
-# VENDOR BOOT — RECOVERY AS VENDOR_BOOT (GKI)
+# VENDOR BOOT — GKI vendor_boot recovery
 # ============================================================
 TARGET_NO_RECOVERY := true
 BOARD_INCLUDE_RECOVERY_RAMDISK_IN_VENDOR_BOOT := true
 BOARD_MOVE_RECOVERY_RESOURCES_TO_VENDOR_BOOT := true
 BOARD_USES_RECOVERY_AS_VENDOR_BOOT := true
+BOARD_USES_VENDOR_BOOTIMAGE := true
 BOARD_USES_GENERIC_KERNEL_IMAGE := true
 
 # ============================================================
-# RECOVERY SETTINGS
-# ============================================================
-TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
-TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery/root/system/etc/recovery.fstab
-BOARD_HAS_LARGE_FILESYSTEM := true
-BOARD_HAS_NO_SELECT_BUTTON := true
-BOARD_SUPPRESS_SECURE_ERASE := true
-
-# ============================================================
-# VERIFIED BOOT (AVB)
-# ============================================================
-BOARD_AVB_ENABLE := true
-BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 3
-BOARD_AVB_RECOVERY_KEY_PATH := external/avb/test/data/testkey_rsa4096.pem
-BOARD_AVB_RECOVERY_ALGORITHM := SHA256_RSA4096
-BOARD_AVB_RECOVERY_ROLLBACK_INDEX := 1
-BOARD_AVB_RECOVERY_ROLLBACK_INDEX_LOCATION := 1
-
-# ============================================================
-# SECURITY PATCHES
-# ============================================================
-PLATFORM_SECURITY_PATCH := 2099-12-31
-PLATFORM_VERSION := 99.87.36
-PLATFORM_VERSION_LAST_STABLE := $(PLATFORM_VERSION)
-VENDOR_SECURITY_PATCH := $(PLATFORM_SECURITY_PATCH)
-BOOT_SECURITY_PATCH := $(PLATFORM_SECURITY_PATCH)
-
-# ============================================================
-# FILESYSTEM — DYNAMIC PARTITIONS
+# PARTITIONS — Dynamic super layout
 # ============================================================
 BOARD_FLASH_BLOCK_SIZE := 262144
 
@@ -138,15 +104,9 @@ BOARD_MAIN_PARTITION_LIST += \
 BOARD_EXT4_SHARE_DUP_BLOCKS := true
 BOARD_USES_METADATA_PARTITION := true
 
-# Output paths for dynamic partitions
-TARGET_COPY_OUT_ODM_DLKM := odm_dlkm
-TARGET_COPY_OUT_PRODUCT := product
-TARGET_COPY_OUT_SYSTEM := system
-TARGET_COPY_OUT_SYSTEM_EXT := system_ext
-TARGET_COPY_OUT_VENDOR := vendor
-TARGET_COPY_OUT_VENDOR_DLKM := vendor_dlkm
-
-# Filesystem types (defaults — device may override for specific partitions)
+# ============================================================
+# FILESYSTEM — Primary types (device may override)
+# ============================================================
 BOARD_SYSTEMIMAGE_FILE_SYSTEM_TYPE := erofs
 BOARD_SYSTEM_EXTIMAGE_FILE_SYSTEM_TYPE := erofs
 BOARD_PRODUCTIMAGE_FILE_SYSTEM_TYPE := erofs
@@ -155,8 +115,39 @@ BOARD_USERDATAIMAGE_FILE_SYSTEM_TYPE := f2fs
 BOARD_ODM_DLKMIMAGE_FILE_SYSTEM_TYPE := ext4
 BOARD_VENDOR_DLKMIMAGE_FILE_SYSTEM_TYPE := ext4
 
-# VNDK
-BOARD_VNDK_VERSION := current
+TARGET_COPY_OUT_ODM_DLKM := odm_dlkm
+TARGET_COPY_OUT_PRODUCT := product
+TARGET_COPY_OUT_SYSTEM := system
+TARGET_COPY_OUT_SYSTEM_EXT := system_ext
+TARGET_COPY_OUT_VENDOR := vendor
+TARGET_COPY_OUT_VENDOR_DLKM := vendor_dlkm
+
+# ============================================================
+# RECOVERY — TWRP settings
+# ============================================================
+TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
+TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery/root/system/etc/recovery.fstab
+TARGET_SYSTEM_PROP := $(DEVICE_PATH)/system.prop
+BOARD_HAS_LARGE_FILESYSTEM := true
+BOARD_HAS_NO_SELECT_BUTTON := true
+BOARD_SUPPRESS_SECURE_ERASE := true
+
+# Security patches
+PLATFORM_SECURITY_PATCH := 2099-12-31
+PLATFORM_VERSION := 99.87.36
+PLATFORM_VERSION_LAST_STABLE := $(PLATFORM_VERSION)
+VENDOR_SECURITY_PATCH := $(PLATFORM_SECURITY_PATCH)
+BOOT_SECURITY_PATCH := $(PLATFORM_SECURITY_PATCH)
+
+# ============================================================
+# AVB — Verified Boot
+# ============================================================
+BOARD_AVB_ENABLE := true
+BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 3
+BOARD_AVB_RECOVERY_KEY_PATH := external/avb/test/data/testkey_rsa4096.pem
+BOARD_AVB_RECOVERY_ALGORITHM := SHA256_RSA4096
+BOARD_AVB_RECOVERY_ROLLBACK_INDEX := 1
+BOARD_AVB_RECOVERY_ROLLBACK_INDEX_LOCATION := 1
 
 # ============================================================
 # CRYPTO — FBE v2 + Metadata Encryption
@@ -165,30 +156,24 @@ TW_INCLUDE_CRYPTO := true
 TW_INCLUDE_CRYPTO_FBE := true
 TW_USE_FSCRYPT_POLICY := 2
 TW_FORCE_KEYMASTER_VER := 4
-
-# Android 13+ vold-based decryption
 TW_CRYPTO_USE_SYSTEM_VOLD := true
 TW_CRYPTO_SYSTEM_VOLD_DECRYPT := true
 TW_CRYPTO_SYSTEM_VOLD_KEY_PATH := "/metadata/vold/metadata_encryption"
 
 # ============================================================
-# GRAPHICS — DRM BACKEND
+# GRAPHICS — DRM Backend
 # ============================================================
 TW_GRAPHICS_BACKEND := "drm"
 TW_GRAPHICS_FORCE_USE_DRM := true
 TW_LOAD_VENDOR_BOOT_MODULES := true
 
 # ============================================================
-# USB CONFIGURATION
+# USB — MTP, ADB, OTG, Fastbootd
 # ============================================================
 TW_EXCLUDE_DEFAULT_USB_INIT := true
 TARGET_USE_CUSTOM_LUN_FILE_PATH := /config/usb_gadget/g1/functions/mass_storage.0/lun.%d/file
 TW_HAS_NO_RECOVERY_PARTITION := true
 TW_USES_OTG_USB := true
-
-# ============================================================
-# MTP
-# ============================================================
 TW_HAS_MTP := true
 
 # ============================================================
@@ -197,24 +182,20 @@ TW_HAS_MTP := true
 RECOVERY_SDCARD_ON_DATA := true
 
 # ============================================================
-# BRIGHTNESS — Defaults (device may override)
-# ============================================================
-TW_BRIGHTNESS_PATH := "/sys/class/backlight/panel/brightness"
-TW_MAX_BRIGHTNESS := 2047
-TW_DEFAULT_BRIGHTNESS := 1200
-
-# ============================================================
 # STATUS BAR — Default layout (device may override)
 # ============================================================
 TW_STATUS_ICONS_ALIGN := center
 TW_CUSTOM_CPU_POS := "300"
 TW_CUSTOM_CLOCK_POS := "70"
 TW_CUSTOM_BATTERY_POS := "790"
+TW_CUSTOM_CPU_TEMP_PATH := sys/devices/virtual/thermal/thermal_zone4/temp
 
 # ============================================================
-# CPU TEMPERATURE — Default path (device may override)
+# BRIGHTNESS — Defaults (device may override)
 # ============================================================
-TW_CUSTOM_CPU_TEMP_PATH := sys/devices/virtual/thermal/thermal_zone4/temp
+TW_BRIGHTNESS_PATH := "/sys/class/backlight/panel/brightness"
+TW_MAX_BRIGHTNESS := 2047
+TW_DEFAULT_BRIGHTNESS := 1200
 
 # ============================================================
 # TWRP FEATURES
@@ -230,9 +211,6 @@ TW_EXCLUDE_TWRPAPP := true
 TW_NO_FASTBOOT_BOOT := true
 TW_NO_LEGACY_PROPS := true
 TW_TARGET_USES_MOUNT := true
-TWRP_INCLUDE_LOGCAT := true
-TARGET_USES_LOGD := true
-TWRP_EVENT_LOGGING := true
 
 # TWRP Tools
 TW_INCLUDE_FB2PNG := true
@@ -252,12 +230,9 @@ TARGET_USES_MKE2FS := true
 # ============================================================
 # DEBUG / LOGGING
 # ============================================================
-# (No device-specific debug modules; TWRP includes its own)
-
-# ============================================================
-# SYSTEM PROPERTIES
-# ============================================================
-TARGET_SYSTEM_PROP := $(DEVICE_PATH)/system.prop
+TWRP_INCLUDE_LOGCAT := true
+TARGET_USES_LOGD := true
+TWRP_EVENT_LOGGING := true
 
 # ============================================================
 # ADDITIONAL CONFIG — Device-specific overrides go in BoardConfig.mk
