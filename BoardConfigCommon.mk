@@ -65,15 +65,14 @@ BOARD_HEADER_SIZE := 2128
 BOARD_VENDOR_CMDLINE := bootopt=64S3,32N2,64N2
 BOARD_VENDOR_BASE := 0x40078000
 
+BOARD_MKBOOTIMG_ARGS += --dtb $(TARGET_PREBUILT_DTB)
 BOARD_MKBOOTIMG_ARGS += --vendor_cmdline $(BOARD_VENDOR_CMDLINE)
 BOARD_MKBOOTIMG_ARGS += --pagesize $(BOARD_PAGE_SIZE) --board ""
 BOARD_MKBOOTIMG_ARGS += --kernel_offset $(BOARD_KERNEL_OFFSET)
 BOARD_MKBOOTIMG_ARGS += --ramdisk_offset $(BOARD_RAMDISK_OFFSET)
 BOARD_MKBOOTIMG_ARGS += --tags_offset $(BOARD_TAGS_OFFSET)
 BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOT_HEADER_VERSION)
-# BOARD_MKBOOTIMG_ARGS += --header_size $(BOARD_HEADER_SIZE)
 BOARD_MKBOOTIMG_ARGS += --dtb_offset $(BOARD_DTB_OFFSET)
-BOARD_MKBOOTIMG_ARGS += --dtb $(TARGET_PREBUILT_DTB)
 
 # Partitions
 BOARD_FLASH_BLOCK_SIZE := 262144
@@ -87,17 +86,13 @@ BOARD_SUPER_PARTITION_SUPER_DEVICE_SIZE := 9122611200
 BOARD_SUPER_IMAGE_SIZE := 9122611200
 BOARD_EXT4_SHARE_DUP_BLOCKS := true
 
-# DTBO partition size (required for BOARD_KERNEL_SEPARATED_DTBO)
-BOARD_DTBOIMG_PARTITION_SIZE := 8388608
-
-# Boot image partition size (required for A/B updates)
-BOARD_BOOTIMAGE_PARTITION_SIZE := 33554432
-
 BOARD_MAIN_PARTITION_LIST += \
+    odm_dlkm \
     product \
     system \
     system_ext \
-    vendor
+    vendor \
+    vendor_dlkm
 
 # Filesystems (SYSTEM SIDE)
 BOARD_SYSTEMIMAGE_FILE_SYSTEM_TYPE := erofs
@@ -106,27 +101,27 @@ BOARD_PRODUCTIMAGE_FILE_SYSTEM_TYPE := erofs
 BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE := erofs
 
 # USERDATA
+BOARD_ODM_DLKMIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_PRODUCTIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_STSTEMIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_SYSTEM_EXTIMAGE_FILE_SYSTEM_TYPE := ext4
 BOARD_USERDATAIMAGE_FILE_SYSTEM_TYPE := f2fs
-TARGET_USERIMAGES_USE_EXT4 := true
-TARGET_USERIMAGES_USE_F2FS := true
+BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_VENDOR_DLKMIMAGE_FILE_SYSTEM_TYPE := ext4
 
 BOARD_USES_METADATA_PARTITION := true
-BOARD_USES_VENDORIMAGE := true
 
 # Output paths
+TARGET_COPY_OUT_ODM_DLKM := odm_dlkm
 TARGET_COPY_OUT_PRODUCT := product
 TARGET_COPY_OUT_SYSTEM := system
 TARGET_COPY_OUT_SYSTEM_EXT := system_ext
 TARGET_COPY_OUT_VENDOR := vendor
+TARGET_COPY_OUT_VENDOR_DLKM := vendor_dlkm
 
 # Platform
 TARGET_BOARD_PLATFORM := mt6768
 BOARD_VNDK_VERSION := current
-
-# System SDK version must match PRODUCT_SHIPPING_API_LEVEL (33)
-# to avoid build error: "BOARD_SYSTEMSDK_VERSIONS (32) must all be greater
-# than or equal to PRODUCT_SHIPPING_API_LEVEL (33)"
-# BOARD_SYSTEMSDK_VERSIONS := 33
 
 # Recovery Settings
 TARGET_NO_RECOVERY := true
@@ -163,9 +158,8 @@ BOOT_SECURITY_PATCH := $(PLATFORM_SECURITY_PATCH)
 # Crypto
 TW_INCLUDE_CRYPTO := true
 TW_INCLUDE_CRYPTO_FBE := true
-TW_INCLUDE_FBE_METADATA_DECRYPT := true
-TW_PREPARE_DATA_MEDIA_EARLY := true
-TW_REQUIRE_FBE := true
+TW_USE_FSCRYPT_POLICY := 2
+TW_FORCE_KEYMASTER_VER := true
 
 TW_FORCE_KEYMASTER_VER := 4
 
@@ -175,7 +169,7 @@ TW_CRYPTO_SYSTEM_VOLD_DECRYPT := true
 TW_CRYPTO_SYSTEM_VOLD_KEY_PATH := "/metadata/vold/metadata_encryption"
 
 # Vendor boot modules loaded for display/touch
-TW_LOAD_VENDOR_MODULES := "mediatek-drm.ko mtk_panel_ext.ko pwm-mtk-disp.ko leds-mtk-disp.ko tran_drm_panel_i2c.ko"
+TW_LOAD_VENDOR_BOOT_MODULES := true
 
 # Mount behavior
 TW_TARGET_USES_MOUNT := true 
@@ -252,12 +246,3 @@ TW_CUSTOM_BATTERY_POS := "790"
 
 # Device Version
 TW_DEVICE_VERSION := Spark 20 (KJ5)
-
-# === VENDOR BOOT CONFIGURATION ===
-# With boot header v4, recovery ramdisk is placed inside vendor_boot
-# This variable is REQUIRED by the build system (build/make/core/) to pass
-# --partition_size to avbtool add_hash_footer when generating vendor_boot.img
-# For MT6768 (Helio G88), the stock scatter file defines vendor_boot at 0x4000000
-BOARD_VENDOR_BOOTIMAGE_PARTITION_SIZE := 67108864
-BOARD_VENDOR_BOOTIMAGE_PARTITION_RESERVED_SIZE := 0
-BOARD_USES_VENDOR_BOOTIMAGE := true
